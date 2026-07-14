@@ -1,0 +1,138 @@
+import type { MetricCard, Activity, ScheduleEvent, QuickAction, Notification } from '@/types'
+
+export const metricCards: Record<string, MetricCard[]> = {
+  student: [
+    { label: 'Enrolled Courses', value: 6, icon: 'BookOpen', trend: { value: 12, positive: true }, gradient: 'from-purple-500 to-pink-500' },
+    { label: 'Upcoming Tasks', value: 4, icon: 'ClipboardList', trend: { value: 2, positive: false }, gradient: 'from-blue-500 to-cyan-500' },
+    { label: 'Pending Clearance', value: 2, icon: 'FileCheck', trend: { value: 1, positive: true }, gradient: 'from-amber-500 to-orange-500' },
+    { label: 'Current GPA', value: '3.8', icon: 'Award', trend: { value: 0.1, positive: true }, gradient: 'from-green-500 to-emerald-500' },
+  ],
+  'academic-unit': [
+    { label: 'Total Classes', value: 12, icon: 'Building2', trend: { value: 3, positive: true }, gradient: 'from-purple-500 to-pink-500' },
+    { label: 'Active Courses', value: 8, icon: 'BookOpen', trend: { value: 1, positive: false }, gradient: 'from-blue-500 to-cyan-500' },
+    { label: 'Total Students', value: 340, icon: 'Users', trend: { value: 28, positive: true }, gradient: 'from-amber-500 to-orange-500' },
+    { label: 'Pending Tasks', value: 7, icon: 'ClipboardList', trend: { value: 4, positive: false }, gradient: 'from-green-500 to-emerald-500' },
+  ],
+  'bursary-unit': [
+    { label: 'Total Payments', value: 245, icon: 'DollarSign', trend: { value: 18, positive: true }, gradient: 'from-purple-500 to-pink-500' },
+    { label: 'Pending Fees', value: 38, icon: 'Clock', trend: { value: 5, positive: false }, gradient: 'from-blue-500 to-cyan-500' },
+    { label: 'Revenue This Month', value: '$12.4K', icon: 'TrendingUp', trend: { value: 8.2, positive: true }, gradient: 'from-amber-500 to-orange-500' },
+    { label: 'Overdue', value: 12, icon: 'AlertTriangle', trend: { value: 3, positive: false }, gradient: 'from-red-500 to-rose-500' },
+  ],
+  'department-unit': [
+    { label: 'Total Students', value: 340, icon: 'Users', trend: { value: 22, positive: true }, gradient: 'from-purple-500 to-pink-500' },
+    { label: 'Staff Members', value: 28, icon: 'UserCheck', trend: { value: 2, positive: true }, gradient: 'from-blue-500 to-cyan-500' },
+    { label: 'Active Classes', value: 12, icon: 'Building2', trend: { value: 1, positive: false }, gradient: 'from-amber-500 to-orange-500' },
+    { label: 'Clearance Requests', value: 15, icon: 'FileCheck', trend: { value: 7, positive: false }, gradient: 'from-green-500 to-emerald-500' },
+  ],
+  superadmin: [
+    { label: 'Total Schools', value: 5, icon: 'Landmark', trend: { value: 0, positive: true }, gradient: 'from-purple-500 to-pink-500' },
+    { label: 'Total Users', value: 1240, icon: 'Users', trend: { value: 56, positive: true }, gradient: 'from-blue-500 to-cyan-500' },
+    { label: 'Active Sessions', value: 89, icon: 'Activity', trend: { value: 12, positive: true }, gradient: 'from-amber-500 to-orange-500' },
+    { label: 'System Alerts', value: 3, icon: 'Bell', trend: { value: 1, positive: false }, gradient: 'from-red-500 to-rose-500' },
+  ],
+}
+
+export const activities: Activity[] = [
+  { id: 'a1', user: { name: 'Dr. Sarah', role: 'Academic' }, action: 'uploaded', target: 'CS 301 Assignment', timestamp: '2 min ago', type: 'info' },
+  { id: 'a2', user: { name: 'John Doe', role: 'Student' }, action: 'submitted', target: 'Physics Lab Report', timestamp: '15 min ago', type: 'success' },
+  { id: 'a3', user: { name: 'Bursary Office', role: 'Admin' }, action: 'processed', target: 'Tuition Payment #4452', timestamp: '1 hour ago', type: 'success' },
+  { id: 'a4', user: { name: 'System', role: 'Auto' }, action: 'flagged', target: 'Overdue Fee - Jane Smith', timestamp: '2 hours ago', type: 'warning' },
+  { id: 'a5', user: { name: 'Dept. Office', role: 'Admin' }, action: 'approved', target: 'Clearance #1023', timestamp: '3 hours ago', type: 'info' },
+  { id: 'a6', user: { name: 'Prof. Emily', role: 'Academic' }, action: 'scheduled', target: 'Department Meeting', timestamp: '5 hours ago', type: 'info' },
+]
+
+export const scheduleEvents: ScheduleEvent[] = [
+  { id: 's1', title: 'Data Structures Lecture', time: '08:00', duration: '1h 30m', location: 'Room 301', type: 'class' },
+  { id: 's2', title: 'Faculty Meeting', time: '10:00', duration: '1h', location: 'Conference Hall A', type: 'meeting' },
+  { id: 's3', title: 'Office Hours', time: '11:30', duration: '2h', location: 'Office 204', type: 'appointment' },
+  { id: 's4', title: 'Study Group Session', time: '14:00', duration: '1h', location: 'Library', type: 'class' },
+  { id: 's5', title: 'Project Review', time: '16:00', duration: '45m', location: 'Lab 101', type: 'task' },
+]
+
+export const quickActions: Record<string, QuickAction[]> = {
+  student: [
+    { label: 'View Classes', icon: 'BookOpen', color: 'purple' },
+    { label: 'Pay Fees', icon: 'DollarSign', color: 'green' },
+    { label: 'Check Clearance', icon: 'FileCheck', color: 'blue' },
+    { label: 'Upload Document', icon: 'Upload', color: 'amber' },
+  ],
+  'academic-unit': [
+    { label: 'Create Class', icon: 'PlusCircle', color: 'purple' },
+    { label: 'Grade Submissions', icon: 'ClipboardCheck', color: 'green' },
+    { label: 'Schedule', icon: 'Calendar', color: 'blue' },
+    { label: 'Reports', icon: 'BarChart3', color: 'amber' },
+  ],
+  'bursary-unit': [
+    { label: 'Process Payment', icon: 'DollarSign', color: 'purple' },
+    { label: 'Generate Invoice', icon: 'FileText', color: 'green' },
+    { label: 'Fee Reports', icon: 'BarChart3', color: 'blue' },
+    { label: 'Send Reminders', icon: 'Bell', color: 'amber' },
+  ],
+  'department-unit': [
+    { label: 'Review Clearance', icon: 'FileCheck', color: 'purple' },
+    { label: 'Manage Classes', icon: 'Building2', color: 'green' },
+    { label: 'Student Records', icon: 'Users', color: 'blue' },
+    { label: 'Department Reports', icon: 'BarChart3', color: 'amber' },
+  ],
+  superadmin: [
+    { label: 'Manage Schools', icon: 'Landmark', color: 'purple' },
+    { label: 'User Management', icon: 'UserCog', color: 'green' },
+    { label: 'System Logs', icon: 'ScrollText', color: 'blue' },
+    { label: 'Analytics', icon: 'BarChart3', color: 'amber' },
+  ],
+}
+
+export const notifications: Notification[] = [
+  { id: 'n1', title: 'New Registration', message: '15 new students registered for Fall 2024', timestamp: '10 min ago', read: false, type: 'info' },
+  { id: 'n2', title: 'Payment Received', message: 'Tuition fee payment of $2,450 received', timestamp: '1 hour ago', read: false, type: 'success' },
+  { id: 'n3', title: 'Clearance Update', message: 'Clearance #1023 has been approved', timestamp: '3 hours ago', read: false, type: 'success' },
+  { id: 'n4', title: 'System Alert', message: 'Server backup completed successfully', timestamp: '5 hours ago', read: true, type: 'warning' },
+  { id: 'n5', title: 'Assignment Deadline', message: 'CS 301 Assignment due in 2 days', timestamp: '1 day ago', read: true, type: 'info' },
+]
+
+export const sidebarItems = {
+  student: [
+    { label: 'Dashboard', icon: 'LayoutDashboard', path: '/student/dashboard' },
+    { label: 'Profile', icon: 'User', path: '/student/profile' },
+    { label: 'My Classes', icon: 'BookOpen', path: '#' },
+    { label: 'Payments', icon: 'DollarSign', path: '#' },
+    { label: 'Clearance', icon: 'FileCheck', path: '#', badge: 2 },
+    { label: 'Documents', icon: 'FolderOpen', path: '#' },
+  ],
+  'academic-unit': [
+    { label: 'Dashboard', icon: 'LayoutDashboard', path: '/academic-unit/dashboard' },
+    { label: 'Profile', icon: 'User', path: '/academic-unit/profile' },
+    { label: 'Classes', icon: 'Building2', path: '#', badge: 12 },
+    { label: 'Courses', icon: 'BookOpen', path: '#' },
+    { label: 'Timetable', icon: 'Calendar', path: '#' },
+    { label: 'Students', icon: 'Users', path: '#' },
+    { label: 'Reports', icon: 'BarChart3', path: '#' },
+  ],
+  'bursary-unit': [
+    { label: 'Dashboard', icon: 'LayoutDashboard', path: '/bursary-unit/dashboard' },
+    { label: 'Profile', icon: 'User', path: '/bursary-unit/profile' },
+    { label: 'Payments', icon: 'DollarSign', path: '#', badge: 38 },
+    { label: 'Invoices', icon: 'FileText', path: '#' },
+    { label: 'Financial Reports', icon: 'BarChart3', path: '#' },
+    { label: 'Students', icon: 'Users', path: '#' },
+  ],
+  'department-unit': [
+    { label: 'Dashboard', icon: 'LayoutDashboard', path: '/department-unit/dashboard' },
+    { label: 'Profile', icon: 'User', path: '/department-unit/profile' },
+    { label: 'Classes', icon: 'Building2', path: '#' },
+    { label: 'Students', icon: 'Users', path: '#', badge: 340 },
+    { label: 'Staff', icon: 'UserCheck', path: '#' },
+    { label: 'Clearance', icon: 'FileCheck', path: '#', badge: 15 },
+    { label: 'Reports', icon: 'BarChart3', path: '#' },
+  ],
+  superadmin: [
+    { label: 'Dashboard', icon: 'LayoutDashboard', path: '/superadmin/dashboard' },
+    { label: 'Profile', icon: 'User', path: '/superadmin/profile' },
+    { label: 'Schools', icon: 'Landmark', path: '#' },
+    { label: 'Users', icon: 'Users', path: '#', badge: 1240 },
+    { label: 'Settings', icon: 'Settings', path: '#' },
+    { label: 'Audit Logs', icon: 'ScrollText', path: '#' },
+    { label: 'Reports', icon: 'BarChart3', path: '#' },
+  ],
+}
