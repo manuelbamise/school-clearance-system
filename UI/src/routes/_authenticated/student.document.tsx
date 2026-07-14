@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   Upload,
   FileText,
   X,
-  Plus,
-  ChevronDown,
-  Check,
   Loader2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,39 @@ function StudentDocumentPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [forms, setForms] = useState<DocumentFormData[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const ITEMS_PER_PAGE = 5;
+
+  const submittedToLabel = (to: string) => {
+    const map: Record<string, string> = {
+      department: 'Department Unit',
+      academic: 'Academic Unit',
+      bursary: 'Bursary Unit',
+    };
+    return map[to] || to;
+  };
+
+  const filteredDocuments = useMemo(
+    () =>
+      documents
+        .filter((doc) => statusFilter === 'all' || doc.status === statusFilter)
+        .filter((doc) =>
+          [doc.name, doc.level, doc.session, submittedToLabel(doc.submittedTo)].some(
+            (field) => field.toLowerCase().includes(searchQuery.toLowerCase()),
+          ),
+        ),
+    [documents, searchQuery, statusFilter],
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filteredDocuments.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedDocuments = filteredDocuments.slice(
+    (safePage - 1) * ITEMS_PER_PAGE,
+    safePage * ITEMS_PER_PAGE,
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -130,15 +162,6 @@ function StudentDocumentPage() {
     };
     const s = map[status] || { variant: 'warning' as const, label: status };
     return <Badge variant={s.variant}>{s.label}</Badge>;
-  };
-
-  const submittedToLabel = (to: string) => {
-    const map: Record<string, string> = {
-      department: 'Department Unit',
-      academic: 'Academic Unit',
-      bursary: 'Bursary Unit',
-    };
-    return map[to] || to;
   };
 
   const bulkMode = selectedFiles.length > 1;
@@ -332,7 +355,42 @@ function StudentDocumentPage() {
           <CardHeader>
             <CardTitle>Past Uploads</CardTitle>
           </CardHeader>
-          <CardContent className="pb-4 ">
+          <CardContent className="space-y-4 p-5">
+            {/* Status Filters */}
+            <div className="flex items-center gap-2">
+              {(['all', 'approved', 'pending', 'rejected'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => {
+                    setStatusFilter(f);
+                    setCurrentPage(1);
+                  }}
+                  className={cn(
+                    'rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors',
+                    statusFilter === f
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'border border-border bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
+                  )}
+                >
+                  {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Search documents..."
+                className="pl-9"
+              />
+            </div>
+
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -355,17 +413,19 @@ function StudentDocumentPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {documents.length === 0 ? (
+                  {filteredDocuments.length === 0 ? (
                     <tr>
                       <td
                         colSpan={5}
                         className="px-5 py-12 text-center text-sm text-muted-foreground"
                       >
-                        No documents uploaded yet.
+                        {searchQuery
+                          ? 'No documents match your search.'
+                          : 'No documents uploaded yet.'}
                       </td>
                     </tr>
                   ) : (
-                    documents.map((doc, i) => (
+                    paginatedDocuments.map((doc, i) => (
                       <motion.tr
                         key={doc.id}
                         initial={{ opacity: 0, x: -8 }}
@@ -399,6 +459,47 @@ function StudentDocumentPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {filteredDocuments.length > 0 && (
+              <div className="flex items-center justify-between pt-2">
+                <p className="text-xs text-muted-foreground">
+                  Showing{' '}
+                  {Math.min(
+                    (safePage - 1) * ITEMS_PER_PAGE + 1,
+                    filteredDocuments.length,
+                  )}
+                  –
+                  {Math.min(safePage * ITEMS_PER_PAGE, filteredDocuments.length)}{' '}
+                  of {filteredDocuments.length}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.max(1, p - 1))
+                    }
+                    disabled={safePage <= 1}
+                    className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    Previous
+                  </button>
+                  <span className="text-xs text-muted-foreground px-2">
+                    Page {safePage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    disabled={safePage >= totalPages}
+                    className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                  >
+                    Next
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
