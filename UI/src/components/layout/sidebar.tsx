@@ -127,7 +127,7 @@ export default function Sidebar() {
                 key={item.label}
                 onClick={() => handleNav(item.path)}
                 className={cn(
-                  'group relative flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                  'group relative flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:cursor-pointer',
                   collapsed && 'justify-center',
                   isActive
                     ? 'gradient-primary text-white shadow-sm'

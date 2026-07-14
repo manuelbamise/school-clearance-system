@@ -17,8 +17,12 @@ import {
   Landmark,
   UserCog,
   ScrollText,
+  MessageCircleWarning,
+  ShieldCheck,
+  User,
 } from 'lucide-react';
 import type { QuickAction as QuickActionType } from '@/types';
+import { useNavigate } from '@tanstack/react-router';
 
 const iconMap: Record<string, React.ElementType> = {
   BookOpen,
@@ -33,6 +37,9 @@ const iconMap: Record<string, React.ElementType> = {
   Building2,
   Users,
   Landmark,
+  ShieldCheck,
+  User,
+  MessageCircleWarning,
   UserCog,
   ScrollText,
 };
@@ -42,10 +49,17 @@ const colorMap: Record<string, string> = {
   green: 'bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500/20',
   blue: 'bg-blue-500/10 text-blue-500 group-hover:bg-blue-500/20',
   amber: 'bg-amber-500/10 text-amber-500 group-hover:bg-amber-500/20',
+  red: 'bg-red-500/10 text-red-500 group-hover:bg-red-500/20',
 };
 
 export default function QuickActions({ role }: { role: Role }) {
+  const navigate = useNavigate();
   const actions = quickActions[role] || [];
+
+  const handleNav = (path: string) => {
+    if (path === '#') return;
+    navigate({ to: path });
+  };
 
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm">
@@ -61,7 +75,8 @@ export default function QuickActions({ role }: { role: Role }) {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
-              className="group flex flex-col items-center gap-2 rounded-lg border border-border/60 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-sm hover:-translate-y-0.5"
+              onClick={() => handleNav(action.path || '#')}
+              className="group flex flex-col items-center gap-2 rounded-lg border border-border/60 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-sm hover:-translate-y-0.5 hover:cursor-pointer"
             >
               <div
                 className={cn(

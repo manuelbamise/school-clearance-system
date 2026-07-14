@@ -255,35 +255,55 @@ export const scheduleEvents: ScheduleEvent[] = [
 
 export const quickActions: Record<string, QuickAction[]> = {
   student: [
-    { label: 'View Classes', icon: 'BookOpen', color: 'purple' },
-    { label: 'Pay Fees', icon: 'DollarSign', color: 'green' },
-    { label: 'Check Clearance', icon: 'FileCheck', color: 'blue' },
-    { label: 'Upload Document', icon: 'Upload', color: 'amber' },
+    {
+      label: 'Check Clearance',
+      icon: 'ShieldCheck',
+      color: 'green',
+      path: '/student/clearance',
+    },
+    {
+      label: 'View Profile',
+      icon: 'User',
+      color: 'blue',
+      path: '/student/profile',
+    },
+    {
+      label: 'Issue Report',
+      icon: 'MessageCircleWarning',
+      color: 'red',
+      path: '/student/report',
+    },
+    {
+      label: 'Upload Document',
+      icon: 'Upload',
+      color: 'amber',
+      path: '/student/document',
+    },
   ],
-  'academic-unit': [
-    { label: 'Create Class', icon: 'PlusCircle', color: 'purple' },
-    { label: 'Grade Submissions', icon: 'ClipboardCheck', color: 'green' },
-    { label: 'Schedule', icon: 'Calendar', color: 'blue' },
-    { label: 'Reports', icon: 'BarChart3', color: 'amber' },
-  ],
-  'bursary-unit': [
-    { label: 'Process Payment', icon: 'DollarSign', color: 'purple' },
-    { label: 'Generate Invoice', icon: 'FileText', color: 'green' },
-    { label: 'Fee Reports', icon: 'BarChart3', color: 'blue' },
-    { label: 'Send Reminders', icon: 'Bell', color: 'amber' },
-  ],
-  'department-unit': [
-    { label: 'Review Clearance', icon: 'FileCheck', color: 'purple' },
-    { label: 'Manage Classes', icon: 'Building2', color: 'green' },
-    { label: 'Student Records', icon: 'Users', color: 'blue' },
-    { label: 'Department Reports', icon: 'BarChart3', color: 'amber' },
-  ],
-  superadmin: [
-    { label: 'Manage Schools', icon: 'Landmark', color: 'purple' },
-    { label: 'User Management', icon: 'UserCog', color: 'green' },
-    { label: 'System Logs', icon: 'ScrollText', color: 'blue' },
-    { label: 'Analytics', icon: 'BarChart3', color: 'amber' },
-  ],
+  // 'academic-unit': [
+  //   { label: 'Create Class', icon: 'PlusCircle', color: 'purple' },
+  //   { label: 'Grade Submissions', icon: 'ClipboardCheck', color: 'green' },
+  //   { label: 'Schedule', icon: 'Calendar', color: 'blue' },
+  //   { label: 'Reports', icon: 'BarChart3', color: 'amber' },
+  // ],
+  // 'bursary-unit': [
+  //   { label: 'Process Payment', icon: 'DollarSign', color: 'purple' },
+  //   { label: 'Generate Invoice', icon: 'FileText', color: 'green' },
+  //   { label: 'Fee Reports', icon: 'BarChart3', color: 'blue' },
+  //   { label: 'Send Reminders', icon: 'Bell', color: 'amber' },
+  // ],
+  // 'department-unit': [
+  //   { label: 'Review Clearance', icon: 'FileCheck', color: 'purple' },
+  //   { label: 'Manage Classes', icon: 'Building2', color: 'green' },
+  //   { label: 'Student Records', icon: 'Users', color: 'blue' },
+  //   { label: 'Department Reports', icon: 'BarChart3', color: 'amber' },
+  // ],
+  // superadmin: [
+  //   { label: 'Manage Schools', icon: 'Landmark', color: 'purple' },
+  //   { label: 'User Management', icon: 'UserCog', color: 'green' },
+  //   { label: 'System Logs', icon: 'ScrollText', color: 'blue' },
+  //   { label: 'Analytics', icon: 'BarChart3', color: 'amber' },
+  // ],
 };
 
 export const notifications: Notification[] = [
@@ -332,9 +352,14 @@ export const notifications: Notification[] = [
 export const sidebarItems = {
   student: [
     { label: 'Dashboard', icon: 'LayoutDashboard', path: '/student/dashboard' },
-    { label: 'Documents', icon: 'FileUp', path: '#' },
-    { label: 'Clearance', icon: 'ShieldCheck', path: '#', badge: 2 },
-    { label: 'Claims', icon: 'MessageCircleWarning', path: '/student/claims' },
+    { label: 'Documents', icon: 'FileUp', path: '/student/document' },
+    {
+      label: 'Clearance',
+      icon: 'ShieldCheck',
+      path: '/student/clearance',
+      badge: 2,
+    },
+    { label: 'Reports', icon: 'MessageCircleWarning', path: '/student/report' },
     { label: 'Profile', icon: 'User', path: '/student/profile' },
   ],
   'academic-unit': [

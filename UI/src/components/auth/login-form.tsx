@@ -1,29 +1,33 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useNavigate } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { useAuth } from '@/contexts/auth-context'
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/contexts/auth-context';
 
 interface LoginFormData {
-  email: string
-  password: string
-  remember: boolean
+  email: string;
+  password: string;
+  remember: boolean;
 }
 
 export default function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
-  const { login, isLoading } = useAuth()
-  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     defaultValues: { email: '', password: '', remember: false },
-  })
+  });
 
   const dashboardPath: Record<string, string> = {
     student: '/student/dashboard',
@@ -31,17 +35,17 @@ export default function LoginForm() {
     'bursary-unit': '/bursary-unit/dashboard',
     'department-unit': '/department-unit/dashboard',
     superadmin: '/superadmin/dashboard',
-  }
+  };
 
   const onSubmit = async (data: LoginFormData) => {
-    setError('')
-    const result = await login(data.email, data.password)
+    setError('');
+    const result = await login(data.email, data.password);
     if (result.success && result.role) {
-      navigate({ to: dashboardPath[result.role] || '/student/dashboard' })
+      navigate({ to: dashboardPath[result.role] || '/student/dashboard' });
     } else {
-      setError(result.error || 'Login failed')
+      setError(result.error || 'Login failed');
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -64,13 +68,18 @@ export default function LoginForm() {
           {...register('email', { required: 'Email is required' })}
           className={errors.email ? 'border-destructive' : ''}
         />
-        {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+        {errors.email && (
+          <p className="text-xs text-destructive">{errors.email.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
-          <button type="button" className="text-xs text-primary hover:underline">
+          <button
+            type="button"
+            className="text-xs text-primary hover:underline"
+          >
             Forgot password?
           </button>
         </div>
@@ -87,18 +96,34 @@ export default function LoginForm() {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </button>
         </div>
-        {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+        {errors.password && (
+          <p className="text-xs text-destructive">{errors.password.message}</p>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
         <Checkbox id="remember" {...register('remember')} />
-        <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">Remember me</Label>
+        <Label
+          htmlFor="remember"
+          className="text-sm font-normal cursor-pointer"
+        >
+          Remember me
+        </Label>
       </div>
 
-      <Button type="submit" variant="gradient" className="w-full h-11" disabled={isLoading}>
+      <Button
+        type="submit"
+        variant="gradient"
+        className="w-full h-11"
+        disabled={isLoading}
+      >
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -109,7 +134,7 @@ export default function LoginForm() {
         )}
       </Button>
 
-      <div className="relative">
+      {/*<div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-border" />
         </div>
@@ -141,7 +166,7 @@ export default function LoginForm() {
         <a href="/signup" className="text-primary font-medium hover:underline">
           Sign up
         </a>
-      </p>
+      </p>*/}
     </form>
-  )
+  );
 }
