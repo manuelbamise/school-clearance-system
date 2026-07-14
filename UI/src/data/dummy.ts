@@ -7,6 +7,8 @@ import type {
   DocumentRecord,
   ClearanceStep,
   ClearanceHistoryItem,
+  Department,
+  UserRecord,
 } from '@/types';
 
 export const metricCards: Record<string, MetricCard[]> = {
@@ -443,6 +445,32 @@ export const clearanceHistory: ClearanceHistoryItem[] = [
   },
   { unit: 'Bursary Unit', status: 'pending', clearedBy: '—', date: '—' },
   { unit: 'Department Unit', status: 'pending', clearedBy: '—', date: '—' },
+];
+
+export const departments: Department[] = [
+  { id: 'dept1', name: 'Computer Science', userCount: 45 },
+  { id: 'dept2', name: 'Mathematics', userCount: 32 },
+  { id: 'dept3', name: 'Physics', userCount: 28 },
+  { id: 'dept4', name: 'Chemistry', userCount: 24 },
+  { id: 'dept5', name: 'Biology', userCount: 30 },
+  { id: 'dept6', name: 'Engineering', userCount: 56 },
+  { id: 'dept7', name: 'Business Administration', userCount: 38 },
+  { id: 'dept8', name: 'Arts & Humanities', userCount: 22 },
+];
+
+export const userRecords: UserRecord[] = [
+  { id: 'u1', name: 'John Doe', email: 'john.doe@university.edu', role: 'student', department: 'Computer Science', lastActive: '2026-04-12', studentId: 'STU-001' },
+  { id: 'u2', name: 'Dr. Sarah Williams', email: 'sarah.williams@university.edu', role: 'academic-unit', department: 'Mathematics', lastActive: '2026-04-11', staffId: 'STA-001' },
+  { id: 'u3', name: 'Mr. James Okafor', email: 'james.okafor@university.edu', role: 'bursary-unit', department: 'Finance', lastActive: '2026-04-10', staffId: 'STA-002' },
+  { id: 'u4', name: 'Prof. Emily Chen', email: 'emily.chen@university.edu', role: 'department-unit', department: 'Computer Science', lastActive: '2026-04-09', staffId: 'STA-003' },
+  { id: 'u5', name: 'Admin User', email: 'admin@university.edu', role: 'superadmin', department: 'Administration', lastActive: '2026-04-12', staffId: 'STA-000' },
+  { id: 'u6', name: 'Jane Smith', email: 'jane.smith@university.edu', role: 'student', department: 'Engineering', lastActive: '2026-04-08', studentId: 'STU-002' },
+  { id: 'u7', name: 'Dr. Michael Brown', email: 'michael.brown@university.edu', role: 'academic-unit', department: 'Physics', lastActive: '2026-04-07', staffId: 'STA-004' },
+  { id: 'u8', name: 'Ms. Grace Okonkwo', email: 'grace.okonkwo@university.edu', role: 'bursary-unit', department: 'Finance', lastActive: '2026-04-06', staffId: 'STA-005' },
+  { id: 'u9', name: 'Dr. Robert Nwosu', email: 'robert.nwosu@university.edu', role: 'department-unit', department: 'Engineering', lastActive: '2026-04-05', staffId: 'STA-006' },
+  { id: 'u10', name: 'Alice Johnson', email: 'alice.johnson@university.edu', role: 'student', department: 'Biology', lastActive: '2026-04-04', studentId: 'STU-003' },
+  { id: 'u11', name: 'Prof. David Lee', email: 'david.lee@university.edu', role: 'academic-unit', department: 'Chemistry', lastActive: '2026-04-03', staffId: 'STA-007' },
+  { id: 'u12', name: 'Mr. Peter Obi', email: 'peter.obi@university.edu', role: 'superadmin', department: 'Administration', lastActive: '2026-04-12', staffId: 'STA-008' },
 ];
 
 export const sidebarItems = {

@@ -89,6 +89,23 @@ export interface ClearanceHistoryItem {
   date: string
 }
 
+export interface Department {
+  id: string;
+  name: string;
+  userCount: number;
+}
+
+export interface UserRecord {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  lastActive: string;
+  studentId?: string;
+  staffId?: string;
+}
+
 export interface Notification {
   id: string;
   title: string;
