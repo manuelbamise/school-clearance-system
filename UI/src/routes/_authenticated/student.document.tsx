@@ -9,6 +9,7 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  RotateCcw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -52,11 +53,18 @@ function StudentDocumentPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [forms, setForms] = useState<DocumentFormData[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [resubmitDoc, setResubmitDoc] = useState<DocumentRecord | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalFileRef = useRef<HTMLInputElement>(null);
   const ITEMS_PER_PAGE = 5;
+
+  const handleModalFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) setSelectedFiles(files);
+  };
 
   const submittedToLabel = (to: string) => {
     const map: Record<string, string> = {
@@ -85,6 +93,20 @@ function StudentDocumentPage() {
     (safePage - 1) * ITEMS_PER_PAGE,
     safePage * ITEMS_PER_PAGE,
   );
+
+  const openResubmit = (doc: DocumentRecord) => {
+    setResubmitDoc(doc);
+    setSelectedFiles([]);
+    setForms([
+      {
+        name: doc.name,
+        level: doc.level,
+        session: doc.session,
+        submittedTo: doc.submittedTo,
+      },
+    ]);
+    setUploadModalOpen(true);
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -121,19 +143,38 @@ function StudentDocumentPage() {
   const handleUpload = () => {
     setUploading(true);
     setTimeout(() => {
-      const newDocs: DocumentRecord[] = forms.map((form, i) => ({
-        id: `d-${Date.now()}-${i}`,
-        name:
-          form.name ||
-          selectedFiles[i]?.name.replace(/\.pdf$/i, '') ||
-          'Untitled',
-        level: form.level || 'N/A',
-        session: form.session || 'N/A',
-        submittedTo: form.submittedTo,
-        status: 'pending' as const,
-        date: new Date().toISOString().split('T')[0],
-      }));
-      setDocuments((prev) => [...newDocs, ...prev]);
+      if (resubmitDoc) {
+        setDocuments((prev) =>
+          prev.map((d) =>
+            d.id === resubmitDoc.id
+              ? {
+                  ...d,
+                  name: forms[0]?.name || d.name,
+                  level: forms[0]?.level || d.level,
+                  session: forms[0]?.session || d.session,
+                  submittedTo: forms[0]?.submittedTo || d.submittedTo,
+                  status: 'pending' as const,
+                  date: new Date().toISOString().split('T')[0],
+                }
+              : d,
+          ),
+        );
+        setResubmitDoc(null);
+      } else {
+        const newDocs: DocumentRecord[] = forms.map((form, i) => ({
+          id: `d-${Date.now()}-${i}`,
+          name:
+            form.name ||
+            selectedFiles[i]?.name.replace(/\.pdf$/i, '') ||
+            'Untitled',
+          level: form.level || 'N/A',
+          session: form.session || 'N/A',
+          submittedTo: form.submittedTo,
+          status: 'pending' as const,
+          date: new Date().toISOString().split('T')[0],
+        }));
+        setDocuments((prev) => [...newDocs, ...prev]);
+      }
       setUploading(false);
       setUploadModalOpen(false);
       setSelectedFiles([]);
@@ -206,18 +247,29 @@ function StudentDocumentPage() {
       </motion.div>
 
       {/* Upload Modal */}
-      <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
+      <Dialog open={uploadModalOpen} onOpenChange={(open) => {
+        if (!open) {
+          setResubmitDoc(null);
+          setSelectedFiles([]);
+          setForms([]);
+        }
+        setUploadModalOpen(open);
+      }}>
         <DialogContent className={cn('max-w-lg', bulkMode && 'max-w-2xl')}>
           <DialogHeader>
             <DialogTitle>
-              {bulkMode
-                ? `Upload ${selectedFiles.length} Documents`
-                : 'Upload Document'}
+              {resubmitDoc
+                ? 'Resubmit Document'
+                : bulkMode
+                  ? `Upload ${selectedFiles.length} Documents`
+                  : 'Upload Document'}
             </DialogTitle>
             <DialogDescription>
-              {bulkMode
-                ? 'Review and fill in details for each document before uploading.'
-                : 'Fill in the document details below.'}
+              {resubmitDoc
+                ? 'Update the details and resubmit your document.'
+                : bulkMode
+                  ? 'Review and fill in details for each document before uploading.'
+                  : 'Fill in the document details below.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -227,6 +279,13 @@ function StudentDocumentPage() {
               bulkMode && 'max-h-96 overflow-y-auto pr-1',
             )}
           >
+            <input
+              ref={modalFileRef}
+              type="file"
+              accept=".pdf"
+              onChange={handleModalFileChange}
+              className="hidden"
+            />
             {forms.map((form, i) => (
               <div
                 key={i}
@@ -305,14 +364,34 @@ function StudentDocumentPage() {
                 {!bulkMode && (
                   <div className="space-y-2">
                     <Label>File</Label>
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-sm text-muted-foreground">
-                      <FileText className="h-4 w-4 shrink-0 text-primary" />
-                      <span className="truncate">{selectedFiles[0]?.name}</span>
-                      <span className="ml-auto shrink-0 text-xs">
-                        {selectedFiles[0] &&
-                          `${(selectedFiles[0].size / 1024).toFixed(1)} KB`}
-                      </span>
-                    </div>
+                    {selectedFiles.length > 0 ? (
+                      <div className="relative flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-sm text-muted-foreground pr-10">
+                        <FileText className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="truncate">
+                          {selectedFiles[0]?.name}
+                        </span>
+                        <span className="ml-auto shrink-0 text-xs">
+                          {selectedFiles[0] &&
+                            `${(selectedFiles[0].size / 1024).toFixed(1)} KB`}
+                        </span>
+                        <button
+                          onClick={() => setSelectedFiles([])}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground hover:bg-muted-foreground/20 transition-colors"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => modalFileRef.current?.click()}
+                      >
+                        <Upload className="h-4 w-4" />
+                        Choose File
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
@@ -337,7 +416,7 @@ function StudentDocumentPage() {
               ) : (
                 <>
                   <Upload className="h-4 w-4" />
-                  {bulkMode ? `Upload All (${selectedFiles.length})` : 'Upload'}
+                  {resubmitDoc ? 'Resubmit' : bulkMode ? `Upload All (${selectedFiles.length})` : 'Upload'}
                 </>
               )}
             </Button>
@@ -451,7 +530,25 @@ function StudentDocumentPage() {
                           {submittedToLabel(doc.submittedTo)}
                         </td>
                         <td className="px-5 py-3.5">
-                          {statusBadge(doc.status)}
+                          <div className="flex flex-col items-start gap-1.5">
+                            {statusBadge(doc.status)}
+                            {doc.status === 'rejected' && (
+                              <>
+                                {doc.rejectionReason && (
+                                  <p className="text-xs text-destructive/80 max-w-[200px] leading-tight">
+                                    {doc.rejectionReason}
+                                  </p>
+                                )}
+                                <button
+                                  onClick={() => openResubmit(doc)}
+                                  className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                >
+                                  <RotateCcw className="h-3 w-3" />
+                                  Resubmit
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </td>
                       </motion.tr>
                     ))

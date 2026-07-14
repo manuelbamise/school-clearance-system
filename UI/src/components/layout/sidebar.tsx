@@ -102,7 +102,9 @@ export default function Sidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary text-white">
               <GraduationCap className="h-4 w-4" />
             </div>
-            <span className="text-lg font-bold text-gradient">E-School</span>
+            <span className="text-lg font-bold text-gradient">
+              Clearance Management System
+            </span>
           </div>
         )}
         {collapsed && (

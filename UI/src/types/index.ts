@@ -68,6 +68,25 @@ export interface DocumentRecord {
   submittedTo: 'department' | 'academic' | 'bursary';
   status: 'approved' | 'pending' | 'rejected';
   date: string;
+  rejectionReason?: string;
+}
+
+export type ClearanceUnit = 'academic' | 'bursary' | 'department'
+
+export interface ClearanceStep {
+  unit: ClearanceUnit
+  label: string
+  cleared: boolean
+  clearedBy?: string
+  clearedAt?: string
+  icon: string
+}
+
+export interface ClearanceHistoryItem {
+  unit: string
+  status: 'cleared' | 'pending'
+  clearedBy: string
+  date: string
 }
 
 export interface Notification {

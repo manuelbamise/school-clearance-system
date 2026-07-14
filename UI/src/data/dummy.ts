@@ -5,6 +5,8 @@ import type {
   QuickAction,
   Notification,
   DocumentRecord,
+  ClearanceStep,
+  ClearanceHistoryItem,
 } from '@/types';
 
 export const metricCards: Record<string, MetricCard[]> = {
@@ -334,6 +336,7 @@ export const pastDocuments: DocumentRecord[] = [
     submittedTo: 'department',
     status: 'rejected',
     date: '2024-11-05',
+    rejectionReason: 'Invalid ID photo. Please upload a clear passport photograph.',
   },
   {
     id: 'd4',
@@ -362,7 +365,7 @@ export const pastDocuments: DocumentRecord[] = [
     status: 'approved',
     date: '2024-10-01',
   },
-]
+];
 
 export const notifications: Notification[] = [
   {
@@ -407,15 +410,48 @@ export const notifications: Notification[] = [
   },
 ];
 
+export const clearanceSteps: ClearanceStep[] = [
+  {
+    unit: 'academic',
+    label: 'Academic Unit',
+    cleared: true,
+    clearedBy: 'Dr. Sarah Williams',
+    clearedAt: '2025-03-10',
+    icon: 'GraduationCap',
+  },
+  {
+    unit: 'bursary',
+    label: 'Bursary Unit',
+    cleared: false,
+    icon: 'DollarSign',
+  },
+  {
+    unit: 'department',
+    label: 'Department Unit',
+    cleared: false,
+    icon: 'Building2',
+  },
+];
+
+export const clearanceHistory: ClearanceHistoryItem[] = [
+  {
+    unit: 'Academic Unit',
+    status: 'cleared',
+    clearedBy: 'Dr. Sarah Williams',
+    date: '2025-03-10',
+  },
+  { unit: 'Bursary Unit', status: 'pending', clearedBy: '—', date: '—' },
+  { unit: 'Department Unit', status: 'pending', clearedBy: '—', date: '—' },
+];
+
 export const sidebarItems = {
   student: [
     { label: 'Dashboard', icon: 'LayoutDashboard', path: '/student/dashboard' },
-    { label: 'Documents', icon: 'FileUp', path: '/student/document' },
+    { label: 'Documents', icon: 'FileUp', path: '/student/document', badge: 2 },
     {
       label: 'Clearance',
       icon: 'ShieldCheck',
       path: '/student/clearance',
-      badge: 2,
     },
     { label: 'Reports', icon: 'MessageCircleWarning', path: '/student/report' },
     { label: 'Profile', icon: 'User', path: '/student/profile' },

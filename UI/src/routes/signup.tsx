@@ -28,7 +28,7 @@ function SignupPage() {
                   <GraduationCap className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-white">
-                  E-School Portal
+                  Clearance Management System
                 </span>
               </div>
 
