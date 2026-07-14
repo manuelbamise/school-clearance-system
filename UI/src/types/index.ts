@@ -106,6 +106,18 @@ export interface UserRecord {
   staffId?: string;
 }
 
+export interface AuditLog {
+  id: string;
+  who: string;
+  whoEmail: string;
+  what: string;
+  when: string;
+  where: string;
+  why: string;
+  category: 'login' | 'permission' | 'export' | 'user-management';
+  status: 'success' | 'failure';
+}
+
 export interface Notification {
   id: string;
   title: string;
