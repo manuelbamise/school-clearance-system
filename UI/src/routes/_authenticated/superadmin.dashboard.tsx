@@ -1,19 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/auth-context'
-import MetricCard from '@/components/dashboard/metric-card'
-import ActivityFeed from '@/components/dashboard/activity-feed'
-import ScheduleCard from '@/components/dashboard/schedule-card'
-import QuickActions from '@/components/dashboard/quick-actions'
-import { metricCards } from '@/data/dummy'
+import { createFileRoute } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/auth-context';
+import MetricCard from '@/components/dashboard/metric-card';
+import ActivityFeed from '@/components/dashboard/activity-feed';
+import ScheduleCard from '@/components/dashboard/schedule-card';
+import QuickActions from '@/components/dashboard/quick-actions';
+import { metricCards } from '@/data/dummy';
 
 export const Route = createFileRoute('/_authenticated/superadmin/dashboard')({
   component: SuperadminDashboard,
-})
+});
 
 function SuperadminDashboard() {
-  const { user } = useAuth()
-  const metrics = metricCards.superadmin || []
+  const { user } = useAuth();
+  const metrics = metricCards.superadmin || [];
 
   return (
     <div className="space-y-6">
@@ -37,7 +37,7 @@ function SuperadminDashboard() {
         </div>
       </motion.div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
         {metrics.map((metric, i) => (
           <MetricCard key={metric.label} data={metric} index={i} />
         ))}
@@ -48,10 +48,9 @@ function SuperadminDashboard() {
           <ActivityFeed />
         </div>
         <div className="space-y-6">
-          <ScheduleCard />
           <QuickActions role="superadmin" />
         </div>
       </div>
     </div>
-  )
+  );
 }

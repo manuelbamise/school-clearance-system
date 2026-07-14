@@ -18,6 +18,7 @@ import {
   BarChart3,
   FileUp,
   FileX,
+  MessageCircleWarning,
 } from 'lucide-react';
 import type { MetricCard as MetricCardType } from '@/types';
 
@@ -39,6 +40,7 @@ const iconMap: Record<string, React.ElementType> = {
   BarChart3,
   FileUp,
   FileX,
+  MessageCircleWarning,
 };
 
 export default function MetricCard({

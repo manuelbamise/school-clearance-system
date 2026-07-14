@@ -132,13 +132,6 @@ export const metricCards: Record<string, MetricCard[]> = {
   ],
   superadmin: [
     {
-      label: 'Total Schools',
-      value: 5,
-      icon: 'Landmark',
-      trend: { value: 0, positive: true },
-      gradient: 'from-purple-500 to-pink-500',
-    },
-    {
       label: 'Total Users',
       value: 1240,
       icon: 'Users',
@@ -146,18 +139,11 @@ export const metricCards: Record<string, MetricCard[]> = {
       gradient: 'from-blue-500 to-cyan-500',
     },
     {
-      label: 'Active Sessions',
+      label: 'Pending Reports',
       value: 89,
-      icon: 'Activity',
+      icon: 'MessageCircleWarning',
       trend: { value: 12, positive: true },
       gradient: 'from-amber-500 to-orange-500',
-    },
-    {
-      label: 'System Alerts',
-      value: 3,
-      icon: 'Bell',
-      trend: { value: 1, positive: false },
-      gradient: 'from-red-500 to-rose-500',
     },
   ],
 };
@@ -301,12 +287,26 @@ export const quickActions: Record<string, QuickAction[]> = {
   //   { label: 'Student Records', icon: 'Users', color: 'blue' },
   //   { label: 'Department Reports', icon: 'BarChart3', color: 'amber' },
   // ],
-  // superadmin: [
-  //   { label: 'Manage Schools', icon: 'Landmark', color: 'purple' },
-  //   { label: 'User Management', icon: 'UserCog', color: 'green' },
-  //   { label: 'System Logs', icon: 'ScrollText', color: 'blue' },
-  //   { label: 'Analytics', icon: 'BarChart3', color: 'amber' },
-  // ],
+  superadmin: [
+    {
+      label: 'User Management',
+      icon: 'UserCog',
+      color: 'green',
+      path: '/superadmin/users',
+    },
+    {
+      label: 'System Logs',
+      icon: 'ScrollText',
+      color: 'blue',
+      path: '/superadmin/audit',
+    },
+    {
+      label: 'Platform Reports',
+      icon: 'MessageCircleWarning',
+      color: 'amber',
+      path: '/superadmin/reports',
+    },
+  ],
 };
 
 export const pastDocuments: DocumentRecord[] = [
@@ -336,7 +336,8 @@ export const pastDocuments: DocumentRecord[] = [
     submittedTo: 'department',
     status: 'rejected',
     date: '2024-11-05',
-    rejectionReason: 'Invalid ID photo. Please upload a clear passport photograph.',
+    rejectionReason:
+      'Invalid ID photo. Please upload a clear passport photograph.',
   },
   {
     id: 'd4',
@@ -500,11 +501,18 @@ export const sidebarItems = {
       icon: 'LayoutDashboard',
       path: '/superadmin/dashboard',
     },
+    {
+      label: 'User Management',
+      icon: 'Users',
+      path: '/superadmin/users',
+      badge: 1240,
+    },
+    { label: 'Audit Logs', icon: 'ScrollText', path: '/superadmin/audit' },
+    {
+      label: 'Reports',
+      icon: 'MessageCircleWarning',
+      path: '/superadmin/reports',
+    },
     { label: 'Profile', icon: 'User', path: '/superadmin/profile' },
-    { label: 'Schools', icon: 'Landmark', path: '#' },
-    { label: 'Users', icon: 'Users', path: '#', badge: 1240 },
-    { label: 'Settings', icon: 'Settings', path: '#' },
-    { label: 'Audit Logs', icon: 'ScrollText', path: '#' },
-    { label: 'Reports', icon: 'BarChart3', path: '#' },
   ],
 };
