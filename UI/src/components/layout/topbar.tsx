@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Menu, Bell, Sun, Moon, ChevronDown } from 'lucide-react'
+import { Menu, Bell, Sun, Moon, PanelLeftOpen, PanelLeftClose } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/auth-context'
@@ -21,7 +21,7 @@ const roleLabels: Record<string, string> = {
 export default function Topbar() {
   const { user } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const { setMobileOpen } = useSidebar()
+  const { collapsed, toggle, setMobileOpen } = useSidebar()
   const [dateStr, setDateStr] = useState('')
   const [notifOpen, setNotifOpen] = useState(false)
   const unread = notifications.filter((n) => !n.read).length
@@ -44,6 +44,13 @@ export default function Topbar() {
           className="flex md:hidden h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
         >
           <Menu className="h-5 w-5" />
+        </button>
+        <button
+          onClick={toggle}
+          className="hidden md:flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
         </button>
         <div className="hidden sm:block">
           <p className="text-sm text-muted-foreground">{dateStr}</p>

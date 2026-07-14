@@ -23,7 +23,6 @@ import {
   PlusCircle,
   Bell,
   LogOut,
-  ChevronLeft,
   GraduationCap,
   ClipboardList,
   Activity,
@@ -35,7 +34,6 @@ import {
   MessageCircleWarning,
   ShieldCheck,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import type { Role } from '@/types';
 
@@ -187,22 +185,9 @@ export default function Sidebar() {
         transition={{ duration: 0.2, ease: 'easeInOut' }}
         className={cn(
           'hidden md:flex h-screen flex-col border-r border-border bg-sidebar overflow-hidden',
-          collapsed ? '' : '',
         )}
       >
         {sidebarContent}
-        {/* Toggle button */}
-        <button
-          onClick={toggle}
-          className="absolute -right-3 top-20 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm hover:text-foreground"
-        >
-          <ChevronLeft
-            className={cn(
-              'h-3 w-3 transition-transform',
-              collapsed && 'rotate-180',
-            )}
-          />
-        </button>
       </motion.aside>
 
       {/* Mobile sheet */}

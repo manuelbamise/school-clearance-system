@@ -4,6 +4,7 @@ import type {
   ScheduleEvent,
   QuickAction,
   Notification,
+  DocumentRecord,
 } from '@/types';
 
 export const metricCards: Record<string, MetricCard[]> = {
@@ -305,6 +306,63 @@ export const quickActions: Record<string, QuickAction[]> = {
   //   { label: 'Analytics', icon: 'BarChart3', color: 'amber' },
   // ],
 };
+
+export const pastDocuments: DocumentRecord[] = [
+  {
+    id: 'd1',
+    name: 'Transcript Request',
+    level: '400L',
+    session: '2023/2024',
+    submittedTo: 'academic',
+    status: 'approved',
+    date: '2024-09-12',
+  },
+  {
+    id: 'd2',
+    name: 'School Fees Receipt',
+    level: '300L',
+    session: '2024/2025',
+    submittedTo: 'bursary',
+    status: 'pending',
+    date: '2025-01-20',
+  },
+  {
+    id: 'd3',
+    name: 'ID Card Application',
+    level: '100L',
+    session: '2024/2025',
+    submittedTo: 'department',
+    status: 'rejected',
+    date: '2024-11-05',
+  },
+  {
+    id: 'd4',
+    name: 'Course Registration Form',
+    level: '400L',
+    session: '2023/2024',
+    submittedTo: 'academic',
+    status: 'approved',
+    date: '2024-08-30',
+  },
+  {
+    id: 'd5',
+    name: 'Clearance Letter',
+    level: '500L',
+    session: '2024/2025',
+    submittedTo: 'department',
+    status: 'pending',
+    date: '2025-02-14',
+  },
+  {
+    id: 'd6',
+    name: 'Hostel Fee Payment',
+    level: '300L',
+    session: '2024/2025',
+    submittedTo: 'bursary',
+    status: 'approved',
+    date: '2024-10-01',
+  },
+]
 
 export const notifications: Notification[] = [
   {

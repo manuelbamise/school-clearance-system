@@ -60,6 +60,16 @@ export interface QuickAction {
   onClick?: () => void;
 }
 
+export interface DocumentRecord {
+  id: string;
+  name: string;
+  level: string;
+  session: string;
+  submittedTo: 'department' | 'academic' | 'bursary';
+  status: 'approved' | 'pending' | 'rejected';
+  date: string;
+}
+
 export interface Notification {
   id: string;
   title: string;
