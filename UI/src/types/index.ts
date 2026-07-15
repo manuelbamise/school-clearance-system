@@ -118,6 +118,17 @@ export interface AuditLog {
   status: 'success' | 'failure';
 }
 
+export interface ReportRecord {
+  id: string;
+  userName: string;
+  userEmail: string;
+  userDepartment: string;
+  title: string;
+  content: string;
+  status: 'pending' | 'resolved';
+  date: string;
+}
+
 export interface Notification {
   id: string;
   title: string;
