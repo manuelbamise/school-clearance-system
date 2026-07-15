@@ -25,7 +25,7 @@ function LoginPage() {
           >
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
               {/* Logo */}
-              <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="flex flex-col items-center justify-center gap-3 mb-8">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary">
                   <GraduationCap className="h-5 w-5 text-white" />
                 </div>

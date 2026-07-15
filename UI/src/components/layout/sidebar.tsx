@@ -33,6 +33,7 @@ import {
   ClipboardCheck,
   MessageCircleWarning,
   ShieldCheck,
+  FileCheck,
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import type { Role } from '@/types';
@@ -65,6 +66,7 @@ const iconMap: Record<string, React.ElementType> = {
   TrendingUp,
   Award,
   ClipboardCheck,
+  FileCheck,
   MessageCircleWarning,
 };
 
