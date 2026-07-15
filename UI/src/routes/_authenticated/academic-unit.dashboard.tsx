@@ -1,19 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/auth-context'
-import MetricCard from '@/components/dashboard/metric-card'
-import ActivityFeed from '@/components/dashboard/activity-feed'
-import ScheduleCard from '@/components/dashboard/schedule-card'
-import QuickActions from '@/components/dashboard/quick-actions'
-import { metricCards } from '@/data/dummy'
+import { createFileRoute } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/auth-context';
+import MetricCard from '@/components/dashboard/metric-card';
+import ActivityFeed from '@/components/dashboard/activity-feed';
+import ScheduleCard from '@/components/dashboard/schedule-card';
+import QuickActions from '@/components/dashboard/quick-actions';
+import { metricCards } from '@/data/dummy';
 
-export const Route = createFileRoute('/_authenticated/academic-unit/dashboard')({
-  component: AcademicUnitDashboard,
-})
+export const Route = createFileRoute('/_authenticated/academic-unit/dashboard')(
+  {
+    component: AcademicUnitDashboard,
+  },
+);
 
 function AcademicUnitDashboard() {
-  const { user } = useAuth()
-  const metrics = metricCards['academic-unit'] || []
+  const { user } = useAuth();
+  const metrics = metricCards['academic-unit'] || [];
 
   return (
     <div className="space-y-6">
@@ -48,10 +50,9 @@ function AcademicUnitDashboard() {
           <ActivityFeed />
         </div>
         <div className="space-y-6">
-          <ScheduleCard />
           <QuickActions role="academic-unit" />
         </div>
       </div>
     </div>
-  )
+  );
 }

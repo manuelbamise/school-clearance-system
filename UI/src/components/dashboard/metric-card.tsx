@@ -19,6 +19,8 @@ import {
   FileUp,
   FileX,
   MessageCircleWarning,
+  FileExclamationPoint,
+  ShieldCheck,
 } from 'lucide-react';
 import type { MetricCard as MetricCardType } from '@/types';
 
@@ -41,6 +43,8 @@ const iconMap: Record<string, React.ElementType> = {
   FileUp,
   FileX,
   MessageCircleWarning,
+  FileExclamationPoint,
+  ShieldCheck,
 };
 
 export default function MetricCard({

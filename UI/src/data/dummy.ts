@@ -46,16 +46,16 @@ export const metricCards: Record<string, MetricCard[]> = {
   ],
   'academic-unit': [
     {
-      label: 'Total Classes',
+      label: 'Documents Pending Approval',
       value: 12,
-      icon: 'Building2',
+      icon: 'FileExclamationPoint',
       trend: { value: 3, positive: true },
-      gradient: 'from-purple-500 to-pink-500',
+      gradient: 'from-red-500 to-emerald-500',
     },
     {
-      label: 'Active Courses',
+      label: 'Students Clearance Pending',
       value: 8,
-      icon: 'BookOpen',
+      icon: 'ShieldCheck',
       trend: { value: 1, positive: false },
       gradient: 'from-blue-500 to-cyan-500',
     },

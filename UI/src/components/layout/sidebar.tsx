@@ -34,6 +34,7 @@ import {
   MessageCircleWarning,
   ShieldCheck,
   FileCheck,
+  FileExclamationPoint,
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import type { Role } from '@/types';
@@ -68,6 +69,7 @@ const iconMap: Record<string, React.ElementType> = {
   ClipboardCheck,
   FileCheck,
   MessageCircleWarning,
+  FileExclamationPoint,
 };
 
 export default function Sidebar() {
