@@ -26,4 +26,30 @@ model User {
   department   Department? @relation(fields: [departmentId], references: [id])
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+
+  reports   Report[]
+  auditLogs AuditLog[]
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  content   String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  reason    String
+  category  String
+  status    String
+  ipAddress String?
+  createdAt DateTime @default(now())
 }

@@ -26,3 +26,16 @@ export const authorize = (...roles: Role[]) => {
     next();
   };
 };
+
+export const denyRole = (...roles: Role[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+    }
+    const user = req.user as { role: Role };
+    if (roles.includes(user.role)) {
+      return res.status(403).json({ status: 'error', message: 'Forbidden for this role' });
+    }
+    next();
+  };
+};
