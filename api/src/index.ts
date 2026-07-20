@@ -1,6 +1,8 @@
 import express from 'express';
 import passport from 'passport';
+import swaggerUi from 'swagger-ui-express';
 import mainRouter from './main.router.js';
+import swaggerSpec from './swagger.js';
 import './auth/passport.js';
 import { errorHandler } from './middleware/error.middleware.js';
 
@@ -9,6 +11,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(passport.initialize());
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', mainRouter);
 app.use(errorHandler);
 
