@@ -26,7 +26,7 @@ function AcademicUnitDashboard() {
       >
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            Welcome, {user?.name?.split(' ')[0] || 'Academic Unit'}
+            Welcome, {user?.name?.split(' ')[1] || 'Academic Unit'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Academic affairs overview and class management.
