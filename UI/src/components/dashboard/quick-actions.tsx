@@ -20,6 +20,7 @@ import {
   MessageCircleWarning,
   ShieldCheck,
   User,
+  FileCheck,
 } from 'lucide-react';
 import type { QuickAction as QuickActionType } from '@/types';
 import { useNavigate } from '@tanstack/react-router';
@@ -42,6 +43,7 @@ const iconMap: Record<string, React.ElementType> = {
   MessageCircleWarning,
   UserCog,
   ScrollText,
+  FileCheck,
 };
 
 const colorMap: Record<string, string> = {

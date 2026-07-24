@@ -46,7 +46,7 @@ export const metricCards: Record<string, MetricCard[]> = {
   ],
   'academic-unit': [
     {
-      label: 'Documents Pending Approval',
+      label: 'Documents Pending',
       value: 12,
       icon: 'FileExclamationPoint',
       trend: { value: 3, positive: true },
@@ -58,20 +58,6 @@ export const metricCards: Record<string, MetricCard[]> = {
       icon: 'ShieldCheck',
       trend: { value: 1, positive: false },
       gradient: 'from-blue-500 to-cyan-500',
-    },
-    {
-      label: 'Total Students',
-      value: 340,
-      icon: 'Users',
-      trend: { value: 28, positive: true },
-      gradient: 'from-amber-500 to-orange-500',
-    },
-    {
-      label: 'Pending Tasks',
-      value: 7,
-      icon: 'ClipboardList',
-      trend: { value: 4, positive: false },
-      gradient: 'from-green-500 to-emerald-500',
     },
   ],
   'bursary-unit': [
@@ -273,12 +259,26 @@ export const quickActions: Record<string, QuickAction[]> = {
       path: '/student/document',
     },
   ],
-  // 'academic-unit': [
-  //   { label: 'Create Class', icon: 'PlusCircle', color: 'purple' },
-  //   { label: 'Grade Submissions', icon: 'ClipboardCheck', color: 'green' },
-  //   { label: 'Schedule', icon: 'Calendar', color: 'blue' },
-  //   { label: 'Reports', icon: 'BarChart3', color: 'amber' },
-  // ],
+  'academic-unit': [
+    {
+      label: 'Approve Documents',
+      icon: 'FileCheck',
+      color: 'green',
+      path: '/academic-unit/document',
+    },
+    {
+      label: 'Clear Student',
+      icon: 'ShieldCheck',
+      color: 'blue',
+      path: '/academic-unit/clearance',
+    },
+    {
+      label: 'Make Report',
+      icon: 'MessageCircleWarning',
+      color: 'red',
+      path: '/academic-unit/report',
+    },
+  ],
   // 'bursary-unit': [
   //   { label: 'Process Payment', icon: 'DollarSign', color: 'purple' },
   //   { label: 'Generate Invoice', icon: 'FileText', color: 'green' },
@@ -369,49 +369,6 @@ export const pastDocuments: DocumentRecord[] = [
     submittedTo: 'bursary',
     status: 'approved',
     date: '2024-10-01',
-  },
-];
-
-export const notifications: Notification[] = [
-  {
-    id: 'n1',
-    title: 'New Registration',
-    message: '15 new students registered for Fall 2024',
-    timestamp: '10 min ago',
-    read: false,
-    type: 'info',
-  },
-  {
-    id: 'n2',
-    title: 'Payment Received',
-    message: 'Tuition fee payment of $2,450 received',
-    timestamp: '1 hour ago',
-    read: false,
-    type: 'success',
-  },
-  {
-    id: 'n3',
-    title: 'Clearance Update',
-    message: 'Clearance #1023 has been approved',
-    timestamp: '3 hours ago',
-    read: false,
-    type: 'success',
-  },
-  {
-    id: 'n4',
-    title: 'System Alert',
-    message: 'Server backup completed successfully',
-    timestamp: '5 hours ago',
-    read: true,
-    type: 'warning',
-  },
-  {
-    id: 'n5',
-    title: 'Assignment Deadline',
-    message: 'CS 301 Assignment due in 2 days',
-    timestamp: '1 day ago',
-    read: true,
-    type: 'info',
   },
 ];
 
