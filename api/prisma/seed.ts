@@ -140,6 +140,34 @@ async function main() {
     }
   }
   console.log(`Created ${sampleReports.length} sample reports`);
+
+  const sampleActivities = [
+    { actorEmail: 'academic@portal.test', action: 'uploaded', target: 'CS 301 Assignment', type: 'info' },
+    { actorEmail: 'student@portal.test', action: 'submitted', target: 'Physics Lab Report', type: 'success' },
+    { actorEmail: 'bursary@portal.test', action: 'processed', target: 'Tuition Payment #4452', type: 'success' },
+    { actorEmail: 'department@portal.test', action: 'approved', target: 'Clearance #1023', type: 'info' },
+    { actorEmail: 'academic@portal.test', action: 'scheduled', target: 'Department Meeting', type: 'info' },
+  ];
+
+  for (const activity of sampleActivities) {
+    const actor = await prisma.user.findUnique({
+      where: { email: activity.actorEmail },
+    });
+    if (actor) {
+      await prisma.activity.upsert({
+        where: { id: `seed-${activity.action}-${activity.target.replace(/\s+/g, '-').toLowerCase()}` },
+        update: {},
+        create: {
+          id: `seed-${activity.action}-${activity.target.replace(/\s+/g, '-').toLowerCase()}`,
+          actorId: actor.id,
+          action: activity.action,
+          target: activity.target,
+          type: activity.type,
+        },
+      });
+    }
+  }
+  console.log(`Created ${sampleActivities.length} sample activities`);
 }
 
 main()

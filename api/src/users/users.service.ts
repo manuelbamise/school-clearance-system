@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import prisma from '../lib/prisma.js';
 import type { Prisma } from '@prisma/client';
+import * as activitiesService from '../activities/activities.service.js';
 import type { CreateUserInput, UpdateUserInput } from './users.validation.js';
 
 const SALT_ROUNDS = 12;
@@ -56,8 +57,8 @@ export const create = async (
 ) => {
   const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
+  const user = await prisma.$transaction(async (tx) => {
+    const u = await tx.user.create({
       data: {
         email: data.email,
         password: hashedPassword,
@@ -74,8 +75,8 @@ export const create = async (
       await tx.auditLog.create({
         data: {
           userId: performedByUserId,
-          action: `Created user: ${user.email}`,
-          reason: `Admin created user with role ${user.role}`,
+          action: `Created user: ${u.email}`,
+          reason: `Admin created user with role ${u.role}`,
           category: 'user-management',
           status: 'success',
           ipAddress: ipAddress ?? null,
@@ -83,8 +84,13 @@ export const create = async (
       });
     }
 
-    return user;
+    return u;
   });
+
+  if (performedByUserId) {
+    activitiesService.log(performedByUserId, 'created user', data.email, 'success');
+  }
+  return user;
 };
 
 export const update = async (
@@ -93,8 +99,8 @@ export const update = async (
   performedByUserId?: string,
   ipAddress?: string,
 ) => {
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.update({
+  const user = await prisma.$transaction(async (tx) => {
+    const u = await tx.user.update({
       where: { id },
       data: {
         ...data,
@@ -108,7 +114,7 @@ export const update = async (
       await tx.auditLog.create({
         data: {
           userId: performedByUserId,
-          action: `Updated user: ${user.email}`,
+          action: `Updated user: ${u.email}`,
           reason: `Admin updated user profile`,
           category: 'user-management',
           status: 'success',
@@ -117,8 +123,10 @@ export const update = async (
       });
     }
 
-    return user;
+    return u;
   });
+
+  return user;
 };
 
 export const remove = async (
@@ -126,14 +134,14 @@ export const remove = async (
   performedByUserId?: string,
   ipAddress?: string,
 ) => {
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.delete({ where: { id } });
+  const user = await prisma.$transaction(async (tx) => {
+    const u = await tx.user.delete({ where: { id } });
 
     if (performedByUserId) {
       await tx.auditLog.create({
         data: {
           userId: performedByUserId,
-          action: `Deleted user: ${user.email}`,
+          action: `Deleted user: ${u.email}`,
           reason: `Admin deleted user account`,
           category: 'user-management',
           status: 'success',
@@ -142,6 +150,11 @@ export const remove = async (
       });
     }
 
-    return user;
+    return u;
   });
+
+  if (performedByUserId) {
+    activitiesService.log(performedByUserId, 'deleted user', user.email, 'warning');
+  }
+  return user;
 };

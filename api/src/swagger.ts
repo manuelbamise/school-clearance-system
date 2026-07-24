@@ -202,6 +202,23 @@ const swaggerSpec = {
           status: { type: 'string', enum: ['success', 'failure'] },
         },
       },
+      Activity: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          user: {
+            type: 'object',
+            properties: {
+              name: { type: 'string', example: 'John Doe' },
+              role: { type: 'string', example: 'student' },
+            },
+          },
+          action: { type: 'string', example: 'uploaded' },
+          target: { type: 'string', example: 'CS 301 Assignment' },
+          timestamp: { type: 'string', format: 'date-time' },
+          type: { type: 'string', enum: ['info', 'success', 'warning', 'error'] },
+        },
+      },
     },
   },
   paths: {
@@ -708,6 +725,37 @@ const swaggerSpec = {
           '401': { description: 'Unauthorized' },
           '403': { description: 'Forbidden — not superAdmin' },
           '404': { description: 'Department not found' },
+        },
+      },
+    },
+
+    '/activities': {
+      get: {
+        tags: ['Activities'],
+        summary: 'List recent activities',
+        description: 'Returns a paginated list of recent user activities for the dashboard feed. Any authenticated user can view.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
+        ],
+        responses: {
+          '200': {
+            description: 'Paginated list of activities',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { type: 'array', items: { $ref: '#/components/schemas/Activity' } },
+                    meta: { $ref: '#/components/schemas/PaginationMeta' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
         },
       },
     },

@@ -1,9 +1,10 @@
 import prisma from '../lib/prisma.js';
+import * as activitiesService from '../activities/activities.service.js';
 import type { CreateReportInput, UpdateReportInput } from './reports.validation.js';
 
 export const create = async (userId: string, data: CreateReportInput, ipAddress?: string) => {
-  return prisma.$transaction(async (tx) => {
-    const report = await tx.report.create({
+  const report = await prisma.$transaction(async (tx) => {
+    const r = await tx.report.create({
       data: {
         userId,
         title: data.title,
@@ -26,8 +27,11 @@ export const create = async (userId: string, data: CreateReportInput, ipAddress?
       },
     });
 
-    return report;
+    return r;
   });
+
+  activitiesService.log(userId, 'submitted report', data.title, 'info');
+  return report;
 };
 
 export const getAll = async (params: {
@@ -72,8 +76,8 @@ export const getAll = async (params: {
 };
 
 export const updateStatus = async (id: string, data: UpdateReportInput, performedByUserId: string, ipAddress?: string) => {
-  return prisma.$transaction(async (tx) => {
-    const report = await tx.report.update({
+  const report = await prisma.$transaction(async (tx) => {
+    const r = await tx.report.update({
       where: { id },
       data: { status: data.status },
       include: { user: { include: { department: true } } },
@@ -82,7 +86,7 @@ export const updateStatus = async (id: string, data: UpdateReportInput, performe
     await tx.auditLog.create({
       data: {
         userId: performedByUserId,
-        action: `Report ${data.status === 'resolved' ? 'resolved' : 'updated'}: ${report.title}`,
+        action: `Report ${data.status === 'resolved' ? 'resolved' : 'updated'}: ${r.title}`,
         reason: `Super admin ${data.status === 'resolved' ? 'resolved' : 'updated'} the report`,
         category: 'user-management',
         status: 'success',
@@ -90,13 +94,17 @@ export const updateStatus = async (id: string, data: UpdateReportInput, performe
       },
     });
 
-    return report;
+    return r;
   });
+
+  const statusText = data.status === 'resolved' ? 'resolved report' : 'updated report';
+  activitiesService.log(performedByUserId, statusText, report.title, data.status === 'resolved' ? 'success' : 'info');
+  return report;
 };
 
 export const remove = async (id: string, performedByUserId: string, ipAddress?: string) => {
-  return prisma.$transaction(async (tx) => {
-    const report = await tx.report.delete({
+  const report = await prisma.$transaction(async (tx) => {
+    const r = await tx.report.delete({
       where: { id },
       include: { user: { include: { department: true } } },
     });
@@ -104,7 +112,7 @@ export const remove = async (id: string, performedByUserId: string, ipAddress?: 
     await tx.auditLog.create({
       data: {
         userId: performedByUserId,
-        action: `Deleted report: ${report.title}`,
+        action: `Deleted report: ${r.title}`,
         reason: 'Super admin deleted the report',
         category: 'user-management',
         status: 'success',
@@ -112,6 +120,9 @@ export const remove = async (id: string, performedByUserId: string, ipAddress?: 
       },
     });
 
-    return report;
+    return r;
   });
+
+  activitiesService.log(performedByUserId, 'deleted report', report.title, 'warning');
+  return report;
 };

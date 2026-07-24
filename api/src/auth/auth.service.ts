@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
+import * as activitiesService from '../activities/activities.service.js';
 import type { RegisterInput } from './auth.validation.js';
 
 const SALT_ROUNDS = 12;
@@ -9,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 export const register = async (data: RegisterInput, ipAddress?: string) => {
   const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
         email: data.email,
@@ -36,6 +37,9 @@ export const register = async (data: RegisterInput, ipAddress?: string) => {
     const token = generateToken(user);
     return { user, token };
   });
+
+  activitiesService.log(result.user.id, 'registered', '', 'success');
+  return result;
 };
 
 export const logLogin = async (userId: string, ipAddress?: string) => {
@@ -49,6 +53,11 @@ export const logLogin = async (userId: string, ipAddress?: string) => {
       ipAddress: ipAddress ?? null,
     },
   });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (user) {
+    activitiesService.log(userId, 'logged in', '', 'info');
+  }
 };
 
 export const generateToken = (user: { id: string; role: string }) => {

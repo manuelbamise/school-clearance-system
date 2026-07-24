@@ -4,6 +4,7 @@ import usersRouter from './users/users.router.js';
 import reportsRouter from './reports/reports.router.js';
 import departmentsRouter from './departments/departments.router.js';
 import auditLogsRouter from './audit-logs/audit-logs.router.js';
+import activitiesRouter from './activities/activities.router.js';
 
 const mainRouter = Router();
 
@@ -16,5 +17,6 @@ mainRouter.use('/users', usersRouter);
 mainRouter.use('/reports', reportsRouter);
 mainRouter.use('/departments', departmentsRouter);
 mainRouter.use('/audit-logs', auditLogsRouter);
+mainRouter.use('/activities', activitiesRouter);
 
 export default mainRouter;
