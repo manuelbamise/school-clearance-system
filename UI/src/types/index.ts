@@ -129,6 +129,24 @@ export interface ReportRecord {
   date: string;
 }
 
+export interface SubmittedDocument {
+  id: string;
+  studentName: string;
+  studentId: string;
+  documentName: string;
+  level: string;
+  session: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+export interface ClearanceRequest {
+  id: string;
+  studentName: string;
+  studentId: string;
+  department: string;
+  cleared: boolean;
+}
+
 export interface Notification {
   id: string;
   title: string;
