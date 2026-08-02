@@ -1,18 +1,24 @@
-import { GraduationCap, FileQuestion, ArrowLeft, LogIn } from 'lucide-react'
-import { useNavigate, useRouter } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
+import { GraduationCap, FileQuestion, ArrowLeft, LogIn } from 'lucide-react';
+import { useNavigate, useRouter } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/auth-context';
 
 export default function NotFoundPage() {
-  const navigate = useNavigate()
-  const router = useRouter()
-
+  const navigate = useNavigate();
+  const router = useRouter();
+  const { logout } = useAuth();
   const goBack = () => {
     if (window.history.length > 1) {
-      router.history.back()
+      router.history.back();
     } else {
-      navigate({ to: '/', replace: true })
+      navigate({ to: '/', replace: true });
     }
-  }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate({ to: '/login' });
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-6">
@@ -41,22 +47,18 @@ export default function NotFoundPage() {
             Page Not Found
           </h3>
           <p className="mt-2 text-sm text-white/60">
-            The page you are looking for doesn't exist or has been moved.
-            Please check the address and try again.
+            The page you are looking for doesn't exist or has been moved. Please
+            check the address and try again.
           </p>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-            <Button
-              variant="gradient"
-              className="gap-2"
-              onClick={goBack}
-            >
+            <Button variant="gradient" className="gap-2" onClick={goBack}>
               <ArrowLeft className="h-4 w-4" />
               Go Back
             </Button>
             <Button
               variant="outline"
               className="gap-2 border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
-              onClick={() => navigate({ to: '/login' })}
+              onClick={handleLogout}
             >
               <LogIn className="h-4 w-4" />
               Go to Login
@@ -65,5 +67,5 @@ export default function NotFoundPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
