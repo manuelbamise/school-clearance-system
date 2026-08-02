@@ -93,32 +93,18 @@ export const metricCards: Record<string, MetricCard[]> = {
   ],
   'department-unit': [
     {
-      label: 'Total Students',
-      value: 340,
-      icon: 'Users',
-      trend: { value: 22, positive: true },
-      gradient: 'from-purple-500 to-pink-500',
-    },
-    {
-      label: 'Staff Members',
-      value: 28,
-      icon: 'UserCheck',
-      trend: { value: 2, positive: true },
-      gradient: 'from-blue-500 to-cyan-500',
-    },
-    {
-      label: 'Active Classes',
+      label: 'Documents Pending',
       value: 12,
-      icon: 'Building2',
-      trend: { value: 1, positive: false },
-      gradient: 'from-amber-500 to-orange-500',
+      icon: 'FileExclamationPoint',
+      trend: { value: 3, positive: true },
+      gradient: 'from-red-500 to-emerald-500',
     },
     {
-      label: 'Clearance Requests',
-      value: 15,
-      icon: 'FileCheck',
-      trend: { value: 7, positive: false },
-      gradient: 'from-green-500 to-emerald-500',
+      label: 'Students Clearance Pending',
+      value: 8,
+      icon: 'ShieldCheck',
+      trend: { value: 1, positive: false },
+      gradient: 'from-blue-500 to-cyan-500',
     },
   ],
   superadmin: [
@@ -286,12 +272,26 @@ export const quickActions: Record<string, QuickAction[]> = {
   //   { label: 'Fee Reports', icon: 'BarChart3', color: 'blue' },
   //   { label: 'Send Reminders', icon: 'Bell', color: 'amber' },
   // ],
-  // 'department-unit': [
-  //   { label: 'Review Clearance', icon: 'FileCheck', color: 'purple' },
-  //   { label: 'Manage Classes', icon: 'Building2', color: 'green' },
-  //   { label: 'Student Records', icon: 'Users', color: 'blue' },
-  //   { label: 'Department Reports', icon: 'BarChart3', color: 'amber' },
-  // ],
+  'department-unit': [
+    {
+      label: 'Approve Documents',
+      icon: 'FileCheck',
+      color: 'green',
+      path: '/department-unit/document',
+    },
+    {
+      label: 'Clear Student',
+      icon: 'ShieldCheck',
+      color: 'blue',
+      path: '/department-unit/clearance',
+    },
+    {
+      label: 'Make Report',
+      icon: 'MessageCircleWarning',
+      color: 'red',
+      path: '/department-unit/report',
+    },
+  ],
   superadmin: [
     {
       label: 'User Management',
