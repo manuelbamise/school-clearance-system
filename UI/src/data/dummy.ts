@@ -1019,13 +1019,25 @@ export const sidebarItems = {
       icon: 'LayoutDashboard',
       path: '/department-unit/dashboard',
     },
+    {
+      label: 'Documents',
+      icon: 'FileCheck',
+      path: '/department-unit/document',
+      badge: 12,
+    },
+    {
+      label: 'Clearance',
+      icon: 'ShieldCheck',
+      path: '/department-unit/clearance',
+    },
+    {
+      label: 'Report',
+      icon: 'MessageCircleWarning',
+      path: '/department-unit/report',
+    },
     { label: 'Profile', icon: 'User', path: '/department-unit/profile' },
-    { label: 'Classes', icon: 'Building2', path: '#' },
-    { label: 'Students', icon: 'Users', path: '#', badge: 340 },
-    { label: 'Staff', icon: 'UserCheck', path: '#' },
-    { label: 'Clearance', icon: 'FileCheck', path: '#', badge: 15 },
-    { label: 'Reports', icon: 'BarChart3', path: '#' },
   ],
+
   superadmin: [
     {
       label: 'Dashboard',
