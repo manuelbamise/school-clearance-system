@@ -219,6 +219,83 @@ const swaggerSpec = {
           type: { type: 'string', enum: ['info', 'success', 'warning', 'error'] },
         },
       },
+      Document: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string', example: 'Transcript Request' },
+          level: { type: 'string', example: '400L' },
+          session: { type: 'string', example: '2024/2025' },
+          unit: { type: 'string', enum: ['academic', 'bursary', 'department'] },
+          status: { type: 'string', enum: ['pending', 'approved', 'rejected'] },
+          rejectionReason: { type: 'string', nullable: true },
+          fileUrl: { type: 'string', example: '/uploads/123456.pdf' },
+          student: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              studentId: { type: 'string' },
+              department: { type: 'string' },
+            },
+          },
+          recipient: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              role: { type: 'string' },
+              department: { type: 'string' },
+            },
+          },
+          reviewedBy: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+            },
+            nullable: true,
+          },
+          reviewedAt: { type: 'string', format: 'date-time', nullable: true },
+          date: { type: 'string', example: '2026-04-12' },
+        },
+      },
+      ClearanceStep: {
+        type: 'object',
+        properties: {
+          unit: { type: 'string', enum: ['academic', 'bursary', 'department'] },
+          status: { type: 'string', enum: ['pending', 'cleared'] },
+          clearedBy: {
+            type: 'object',
+            properties: { id: { type: 'string' }, name: { type: 'string' } },
+            nullable: true,
+          },
+          clearedAt: { type: 'string', format: 'date-time', nullable: true },
+        },
+      },
+      ClearanceListItem: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          student: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              studentId: { type: 'string' },
+              department: { type: 'string' },
+            },
+          },
+          unit: { type: 'string' },
+          status: { type: 'string', enum: ['pending', 'cleared'] },
+          clearedBy: {
+            type: 'object',
+            properties: { id: { type: 'string' }, name: { type: 'string' } },
+            nullable: true,
+          },
+          clearedAt: { type: 'string', format: 'date-time', nullable: true },
+        },
+      },
     },
   },
   paths: {
@@ -808,6 +885,256 @@ const swaggerSpec = {
           },
           '401': { description: 'Unauthorized' },
           '403': { description: 'Forbidden — not superAdmin' },
+        },
+      },
+    },
+
+    '/documents': {
+      post: {
+        tags: ['Documents'],
+        summary: 'Upload a document',
+        description: 'Student uploads a document and sends it to the chosen unit (academic, bursary, or their department). Multipart form-data with a "file" field. The student is automatically added to the clearance list on their first upload.',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                required: ['name', 'unit', 'file'],
+                properties: {
+                  name: { type: 'string', description: 'Document name' },
+                  level: { type: 'string', description: 'e.g. 400L' },
+                  session: { type: 'string', description: 'e.g. 2024/2025' },
+                  unit: { type: 'string', enum: ['academic', 'bursary', 'department'] },
+                  file: { type: 'string', format: 'binary', description: 'PDF or image file (max 5MB)' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Document uploaded',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/Document' },
+                  },
+                },
+              },
+            },
+          },
+          '400': { description: 'Validation error or missing file' },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden — not a student' },
+        },
+      },
+      get: {
+        tags: ['Documents'],
+        summary: 'List my documents',
+        description: 'Returns the authenticated student\'s uploaded documents. Requires student role.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
+          { in: 'query', name: 'status', schema: { type: 'string', enum: ['all', 'pending', 'approved', 'rejected'] } },
+        ],
+        responses: {
+          '200': {
+            description: 'Paginated list of documents',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { type: 'array', items: { $ref: '#/components/schemas/Document' } },
+                    meta: { $ref: '#/components/schemas/PaginationMeta' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden — not a student' },
+        },
+      },
+    },
+
+    '/documents/inbox': {
+      get: {
+        tags: ['Documents'],
+        summary: 'List received documents',
+        description: 'Returns documents routed to the authenticated unit staff. Academic and bursary staff receive all documents for their unit; department staff receive documents for their own department. Requires academic, bursary, or department role.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
+          { in: 'query', name: 'status', schema: { type: 'string', enum: ['all', 'pending', 'approved', 'rejected'] } },
+          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by document name or student' },
+        ],
+        responses: {
+          '200': {
+            description: 'Paginated list of received documents',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { type: 'array', items: { $ref: '#/components/schemas/Document' } },
+                    meta: { $ref: '#/components/schemas/PaginationMeta' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+        },
+      },
+    },
+
+    '/documents/{id}/review': {
+      patch: {
+        tags: ['Documents'],
+        summary: 'Approve or reject a document',
+        description: 'Approves or rejects a document sent to the authenticated unit staff. A rejection reason is required when rejecting.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['status'],
+                properties: {
+                  status: { type: 'string', enum: ['approved', 'rejected'] },
+                  rejectionReason: { type: 'string', description: 'Required when rejecting' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Document reviewed',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/Document' },
+                  },
+                },
+              },
+            },
+          },
+          '400': { description: 'Validation error' },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden — not the recipient' },
+          '404': { description: 'Document not found' },
+        },
+      },
+    },
+
+    '/clearance/me': {
+      get: {
+        tags: ['Clearance'],
+        summary: 'Get my clearance status',
+        description: 'Returns the authenticated student\'s clearance steps across the academic, bursary, and department units. Requires student role.',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': {
+            description: 'Clearance status',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: {
+                      type: 'object',
+                      properties: {
+                        clearance: { type: 'object', nullable: true },
+                        steps: { type: 'array', items: { $ref: '#/components/schemas/ClearanceStep' } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden — not a student' },
+        },
+      },
+    },
+
+    '/clearance': {
+      get: {
+        tags: ['Clearance'],
+        summary: 'List clearance requests',
+        description: 'Returns the clearance list for the authenticated unit staff\'s unit. Academic and bursary staff see all students; department staff see students in their own department. Requires academic, bursary, or department role.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
+          { in: 'query', name: 'status', schema: { type: 'string', enum: ['all', 'pending', 'cleared'] } },
+          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by student name or ID' },
+        ],
+        responses: {
+          '200': {
+            description: 'Paginated list of clearance requests',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { type: 'array', items: { $ref: '#/components/schemas/ClearanceListItem' } },
+                    meta: { $ref: '#/components/schemas/PaginationMeta' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+        },
+      },
+    },
+
+    '/clearance/{studentId}/clear': {
+      patch: {
+        tags: ['Clearance'],
+        summary: 'Clear a student',
+        description: 'Marks the student as cleared for the authenticated unit staff\'s unit. Department staff can only clear students in their own department. Requires academic, bursary, or department role.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { in: 'path', name: 'studentId', required: true, schema: { type: 'string' } },
+        ],
+        responses: {
+          '200': {
+            description: 'Student cleared',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/SuccessMessage' },
+              },
+            },
+          },
+          '400': { description: 'Student not on clearance list or wrong department' },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+          '404': { description: 'Clearance not found' },
         },
       },
     },

@@ -27,9 +27,14 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  reports   Report[]
-  auditLogs AuditLog[]
-  activities Activity[]
+  reports            Report[]
+  auditLogs          AuditLog[]
+  activities         Activity[]
+  documentsSubmitted Document[]    @relation("DocumentStudent")
+  documentsReceived  Document[]    @relation("DocumentRecipient")
+  documentsReviewed  Document[]    @relation("DocumentReviewer")
+  clearance          Clearance?
+  clearedUnits       ClearanceUnit[] @relation("ClearanceClearedBy")
 }
 
 model Report {
@@ -63,4 +68,48 @@ model Activity {
   target    String
   type      String   @default("info")
   createdAt DateTime @default(now())
+}
+
+model Document {
+  id              String    @id @default(cuid())
+  name            String
+  level           String?
+  session         String?
+  unit            String
+  status          String    @default("pending")
+  rejectionReason String?
+  filePath        String
+  fileSize        Int?
+  mimeType        String?
+  studentId       String
+  student         User      @relation("DocumentStudent", fields: [studentId], references: [id])
+  recipientId     String
+  recipient       User      @relation("DocumentRecipient", fields: [recipientId], references: [id])
+  reviewedById    String?
+  reviewedBy      User?     @relation("DocumentReviewer", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Clearance {
+  id        String          @id @default(cuid())
+  studentId String          @unique
+  student   User            @relation(fields: [studentId], references: [id])
+  units     ClearanceUnit[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model ClearanceUnit {
+  id          String    @id @default(cuid())
+  clearanceId String
+  clearance   Clearance @relation(fields: [clearanceId], references: [id])
+  unit        String
+  status      String    @default("pending")
+  clearedById String?
+  clearedBy   User?     @relation("ClearanceClearedBy", fields: [clearedById], references: [id])
+  clearedAt   DateTime?
+
+  @@unique([clearanceId, unit])
 }

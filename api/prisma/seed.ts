@@ -50,6 +50,14 @@ const users = [
     staffId: 'DEP001',
     departmentIndex: 1,
   },
+  {
+    email: 'csdepartment@portal.test',
+    password: 'password123',
+    name: 'CS Department Head',
+    role: 'department' as const,
+    staffId: 'DEP002',
+    departmentIndex: 0,
+  },
 ];
 
 const sampleReports = [
@@ -168,6 +176,84 @@ async function main() {
     }
   }
   console.log(`Created ${sampleActivities.length} sample activities`);
+
+  const student = await prisma.user.findUnique({
+    where: { email: 'student@portal.test' },
+    include: { department: true },
+  });
+  const academic = await prisma.user.findUnique({
+    where: { email: 'academic@portal.test' },
+  });
+  const csDepartmentHead = await prisma.user.findUnique({
+    where: { email: 'csdepartment@portal.test' },
+  });
+
+  if (student && academic) {
+    await prisma.document.upsert({
+      where: { id: 'seed-transcript-request' },
+      update: {},
+      create: {
+        id: 'seed-transcript-request',
+        name: 'Transcript Request',
+        level: '400L',
+        session: '2024/2025',
+        unit: 'academic',
+        status: 'approved',
+        filePath: '/uploads/seed-transcript-request.pdf',
+        fileSize: 245000,
+        mimeType: 'application/pdf',
+        studentId: student.id,
+        recipientId: academic.id,
+        reviewedById: academic.id,
+        reviewedAt: new Date(),
+      },
+    });
+
+    if (csDepartmentHead) {
+      await prisma.document.upsert({
+        where: { id: 'seed-clearance-letter' },
+        update: {},
+        create: {
+          id: 'seed-clearance-letter',
+          name: 'Clearance Letter',
+          level: '500L',
+          session: '2024/2025',
+          unit: 'department',
+          status: 'pending',
+          filePath: '/uploads/seed-clearance-letter.pdf',
+          fileSize: 189000,
+          mimeType: 'application/pdf',
+          studentId: student.id,
+          recipientId: csDepartmentHead.id,
+        },
+      });
+    }
+
+    const clearance = await prisma.clearance.upsert({
+      where: { studentId: student.id },
+      update: {},
+      create: {
+        id: 'seed-clearance',
+        studentId: student.id,
+        units: {
+          create: [
+            { id: 'seed-clearance-unit-academic', unit: 'academic', status: 'cleared', clearedById: academic.id, clearedAt: new Date() },
+            { id: 'seed-clearance-unit-bursary', unit: 'bursary', status: 'pending' },
+            { id: 'seed-clearance-unit-department', unit: 'department', status: 'pending' },
+          ],
+        },
+      },
+    });
+
+    if (csDepartmentHead) {
+      await prisma.clearanceUnit.update({
+        where: { id: 'seed-clearance-unit-department' },
+        data: { status: 'cleared', clearedById: csDepartmentHead.id, clearedAt: new Date() },
+      }).catch(() => {});
+    }
+
+    console.log(`Seeded documents and clearance for ${student.name}`);
+  }
 }
 
 main()

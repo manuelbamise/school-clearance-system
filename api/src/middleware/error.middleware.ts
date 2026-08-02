@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import { AppError } from '../lib/AppError.js';
 
 export const errorHandler = (
   err: Error,
@@ -13,6 +14,21 @@ export const errorHandler = (
       message: 'Validation failed',
       errors: err.issues,
     });
+  }
+
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      status: 'error',
+      message: err.message,
+    });
+  }
+
+  if ((err as any).name === 'MulterError') {
+    const message =
+      (err as any).code === 'LIMIT_FILE_SIZE'
+        ? 'File is too large (max 5MB)'
+        : (err as any).message || 'Upload failed';
+    return res.status(400).json({ status: 'error', message });
   }
 
   if ((err as any).code === 'P2002') {
