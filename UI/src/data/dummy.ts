@@ -63,34 +63,21 @@ export const metricCards: Record<string, MetricCard[]> = {
   ],
   'bursary-unit': [
     {
-      label: 'Total Payments',
-      value: 245,
-      icon: 'DollarSign',
-      trend: { value: 18, positive: true },
-      gradient: 'from-purple-500 to-pink-500',
+      label: 'Documents Pending',
+      value: 12,
+      icon: 'FileExclamationPoint',
+      trend: { value: 3, positive: true },
+      gradient: 'from-red-500 to-emerald-500',
     },
     {
-      label: 'Pending Fees',
-      value: 38,
-      icon: 'Clock',
-      trend: { value: 5, positive: false },
+      label: 'Students Clearance Pending',
+      value: 8,
+      icon: 'ShieldCheck',
+      trend: { value: 1, positive: false },
       gradient: 'from-blue-500 to-cyan-500',
     },
-    {
-      label: 'Revenue This Month',
-      value: '$12.4K',
-      icon: 'TrendingUp',
-      trend: { value: 8.2, positive: true },
-      gradient: 'from-amber-500 to-orange-500',
-    },
-    {
-      label: 'Overdue',
-      value: 12,
-      icon: 'AlertTriangle',
-      trend: { value: 3, positive: false },
-      gradient: 'from-red-500 to-rose-500',
-    },
   ],
+
   'department-unit': [
     {
       label: 'Documents Pending',
@@ -266,12 +253,28 @@ export const quickActions: Record<string, QuickAction[]> = {
       path: '/academic-unit/report',
     },
   ],
-  // 'bursary-unit': [
-  //   { label: 'Process Payment', icon: 'DollarSign', color: 'purple' },
-  //   { label: 'Generate Invoice', icon: 'FileText', color: 'green' },
-  //   { label: 'Fee Reports', icon: 'BarChart3', color: 'blue' },
-  //   { label: 'Send Reminders', icon: 'Bell', color: 'amber' },
-  // ],
+
+  'bursary-unit': [
+    {
+      label: 'Approve Documents',
+      icon: 'FileCheck',
+      color: 'green',
+      path: '/bursary-unit/document',
+    },
+    {
+      label: 'Clear Student',
+      icon: 'ShieldCheck',
+      color: 'blue',
+      path: '/bursary-unit/clearance',
+    },
+    {
+      label: 'Make Report',
+      icon: 'MessageCircleWarning',
+      color: 'red',
+      path: '/bursary-unit/report',
+    },
+  ],
+
   'department-unit': [
     {
       label: 'Approve Documents',
@@ -1007,12 +1010,25 @@ export const sidebarItems = {
       icon: 'LayoutDashboard',
       path: '/bursary-unit/dashboard',
     },
+    {
+      label: 'Documents',
+      icon: 'FileCheck',
+      path: '/bursary-unit/document',
+      badge: 12,
+    },
+    {
+      label: 'Clearance',
+      icon: 'ShieldCheck',
+      path: '/bursary-unit/clearance',
+    },
+    {
+      label: 'Report',
+      icon: 'MessageCircleWarning',
+      path: '/bursary-unit/report',
+    },
     { label: 'Profile', icon: 'User', path: '/bursary-unit/profile' },
-    { label: 'Payments', icon: 'DollarSign', path: '#', badge: 38 },
-    { label: 'Invoices', icon: 'FileText', path: '#' },
-    { label: 'Financial Reports', icon: 'BarChart3', path: '#' },
-    { label: 'Students', icon: 'Users', path: '#' },
   ],
+
   'department-unit': [
     {
       label: 'Dashboard',

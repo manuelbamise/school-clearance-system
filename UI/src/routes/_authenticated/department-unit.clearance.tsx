@@ -167,9 +167,9 @@ function DepartmentUnitClearancePage() {
                     <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Student
                     </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {/*<th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Department
-                    </th>
+                    </th>*/}
                     <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Status
                     </th>
@@ -209,9 +209,9 @@ function DepartmentUnitClearancePage() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 text-muted-foreground">
+                        {/*<td className="px-5 py-3.5 text-muted-foreground">
                           {req.department}
-                        </td>
+                        </td>*/}
                         <td className="px-5 py-3.5">
                           <Badge
                             variant={
