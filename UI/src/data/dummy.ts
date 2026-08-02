@@ -3,7 +3,6 @@ import type {
   Activity,
   ScheduleEvent,
   QuickAction,
-  Notification,
   DocumentRecord,
   ClearanceStep,
   ClearanceHistoryItem,
