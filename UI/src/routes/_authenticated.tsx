@@ -1,10 +1,17 @@
-import { createFileRoute, Outlet, Navigate, useLocation } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useLocation, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import DashboardShell from '@/components/layout/dashboard-shell'
 import { useAuth } from '@/contexts/auth-context'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getToken } from '@/utils/axios'
 import type { Role } from '@/types'
 
 export const Route = createFileRoute('/_authenticated')({
+  beforeLoad: () => {
+    if (!getToken()) {
+      throw redirect({ to: '/login' })
+    }
+  },
   component: AuthenticatedLayout,
 })
 
@@ -33,9 +40,24 @@ const DASHBOARD_BY_ROLE: Record<Role, DashboardPath> = {
 
 function AuthenticatedLayout() {
   const { user, isHydrating } = useAuth()
+  const navigate = useNavigate()
   const location = useLocation()
 
-  if (isHydrating) {
+  useEffect(() => {
+    if (isHydrating) return
+    if (!user) {
+      navigate({ to: '/login', replace: true })
+      return
+    }
+    const path = location.pathname
+    const prefix = rolePrefix[user.role]
+    const isOnOwnRoute = path === '/' || path.startsWith(prefix)
+    if (!isOnOwnRoute) {
+      navigate({ to: DASHBOARD_BY_ROLE[user.role], replace: true })
+    }
+  }, [isHydrating, user, location.pathname, navigate])
+
+  if (isHydrating || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="w-full max-w-sm space-y-4 p-6">
@@ -45,18 +67,6 @@ function AuthenticatedLayout() {
         </div>
       </div>
     )
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
-
-  const path = location.pathname
-  const prefix = rolePrefix[user.role]
-  const isOnOwnRoute = path === '/' || path.startsWith(prefix)
-
-  if (!isOnOwnRoute) {
-    return <Navigate to={DASHBOARD_BY_ROLE[user.role]} replace />
   }
 
   return (
