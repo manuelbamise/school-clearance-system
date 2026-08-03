@@ -35,6 +35,7 @@ model User {
   documentsReviewed  Document[]    @relation("DocumentReviewer")
   clearance          Clearance?
   clearedUnits       ClearanceUnit[] @relation("ClearanceClearedBy")
+  metrics            Metric[]
 }
 
 model Report {
@@ -112,4 +113,20 @@ model ClearanceUnit {
   clearedAt   DateTime?
 
   @@unique([clearanceId, unit])
+}
+
+model Metric {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  period    String
+  key       String
+  label     String
+  value     Int
+  icon      String
+  gradient  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, period, key])
 }

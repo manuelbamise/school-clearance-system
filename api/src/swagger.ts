@@ -296,6 +296,22 @@ const swaggerSpec = {
           clearedAt: { type: 'string', format: 'date-time', nullable: true },
         },
       },
+      MetricCard: {
+        type: 'object',
+        properties: {
+          label: { type: 'string', example: 'Documents Uploaded' },
+          value: { type: 'integer', example: 6 },
+          icon: { type: 'string', example: 'FileUp' },
+          gradient: { type: 'string', example: 'from-purple-500 to-pink-500' },
+          trend: {
+            type: 'object',
+            properties: {
+              value: { type: 'integer', example: 12 },
+              positive: { type: 'boolean', example: true },
+            },
+          },
+        },
+      },
     },
   },
   paths: {
@@ -1135,6 +1151,32 @@ const swaggerSpec = {
           '401': { description: 'Unauthorized' },
           '403': { description: 'Forbidden' },
           '404': { description: 'Clearance not found' },
+        },
+      },
+    },
+
+    '/metrics': {
+      get: {
+        tags: ['Metrics'],
+        summary: 'Get dashboard metrics',
+        description: 'Returns the authenticated user\'s dashboard metric cards computed for the current month, with trend compared to the previous month. Metrics differ per role. Computed live and stored as snapshots.',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': {
+            description: 'Dashboard metrics',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { type: 'array', items: { $ref: '#/components/schemas/MetricCard' } },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
         },
       },
     },
