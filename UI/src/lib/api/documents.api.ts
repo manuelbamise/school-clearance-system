@@ -22,6 +22,11 @@ export const getMyDocuments = async (
   return { documents: data, meta }
 }
 
+export const getDocument = async (id: string): Promise<ApiDocument> => {
+  const res = await apiClient.get(`/documents/${id}`)
+  return unwrap<ApiDocument>(res.data).data
+}
+
 export const getInbox = async (
   query: DocumentQuery = {},
 ): Promise<{ documents: ApiDocument[]; meta?: PaginationMeta }> => {

@@ -84,6 +84,22 @@ export const getMine = async (
   }
 };
 
+export const getById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const document = await documentsService.getById(req.params.id);
+    if (!document) {
+      return res.status(404).json({ status: 'error', message: 'Document not found' });
+    }
+    res.json({ status: 'success', data: sanitize(document) });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getInbox = async (
   req: Request,
   res: Response,

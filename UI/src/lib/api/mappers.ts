@@ -93,6 +93,7 @@ export const mapClearanceSteps = (steps: ApiClearanceStep[]): ClearanceStep[] =>
 
 export const mapClearanceItem = (item: ApiClearanceItem): ClearanceRequest => ({
   id: item.id,
+  userId: item.student.id,
   studentName: item.student.name,
   studentId: item.student.studentId ?? item.student.id,
   department: item.student.department,

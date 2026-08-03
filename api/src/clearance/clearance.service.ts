@@ -151,6 +151,6 @@ export const clear = async (
 
     return { updated, unit };
   }).then(async ({ unit }) => {
-    await activitiesService.log(staffId, 'cleared student', `${unit} unit`, 'success');
+    await activitiesService.log(staffId, 'cleared student', `${unit} unit`, 'success', unit);
   });
 };

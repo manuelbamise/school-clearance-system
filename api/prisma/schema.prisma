@@ -68,6 +68,7 @@ model Activity {
   action    String
   target    String
   type      String   @default("info")
+  unit      String?
   createdAt DateTime @default(now())
 }
 

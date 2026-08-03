@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Trash2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,10 +12,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogClose,
 } from '@/components/ui/dialog';
-import { reportRecords as initialReports } from '@/data/dummy';
+import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states';
+import { useAsync } from '@/hooks/use-async';
+import { getReports, updateReportStatus, deleteReport } from '@/lib/api/reports.api';
+import { mapReport } from '@/lib/api/mappers';
+import { errorMessage } from '@/lib/api/client';
 import type { ReportRecord } from '@/types';
 
 export const Route = createFileRoute('/_authenticated/superadmin/reports')({
@@ -25,12 +28,18 @@ export const Route = createFileRoute('/_authenticated/superadmin/reports')({
 const MAX_TITLE_LENGTH = 50;
 
 function SuperadminReportsPage() {
-  const [reports, setReports] = useState<ReportRecord[]>(initialReports);
+  const reportsReq = useAsync<ReportRecord[]>(
+    async () => (await getReports({ limit: 100 })).reports.map(mapReport),
+    [],
+  );
+  const reports = reportsReq.data ?? [];
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'resolved'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedReport, setSelectedReport] = useState<ReportRecord | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const ITEMS_PER_PAGE = 5;
 
   const filteredReports = useMemo(
@@ -54,23 +63,36 @@ function SuperadminReportsPage() {
 
   const openPreview = (report: ReportRecord) => {
     setSelectedReport(report);
+    setActionError(null);
     setPreviewOpen(true);
   };
 
-  const handleResolve = () => {
+  const handleResolve = async () => {
     if (!selectedReport) return;
-    setReports((prev) =>
-      prev.map((r) =>
-        r.id === selectedReport.id ? { ...r, status: 'resolved' as const } : r,
-      ),
-    );
-    setSelectedReport((prev) =>
-      prev ? { ...prev, status: 'resolved' as const } : null,
-    );
+    setBusy(true);
+    setActionError(null);
+    try {
+      await updateReportStatus(selectedReport.id, { status: 'resolved' });
+      await reportsReq.refetch();
+      setSelectedReport((prev) => (prev ? { ...prev, status: 'resolved' as const } : null));
+    } catch (err) {
+      setActionError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setReports((prev) => prev.filter((r) => r.id !== id));
+  const handleDelete = async (id: string) => {
+    setBusy(true);
+    setActionError(null);
+    try {
+      await deleteReport(id);
+      await reportsReq.refetch();
+    } catch (err) {
+      setActionError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const truncate = (text: string, max: number) =>
@@ -134,6 +156,15 @@ function SuperadminReportsPage() {
             </div>
 
             {/* Table */}
+            {reportsReq.isLoading ? (
+              <TableSkeleton rows={4} cols={5} />
+            ) : reportsReq.error ? (
+              <ErrorState message={reportsReq.error} onRetry={reportsReq.refetch} />
+            ) : filteredReports.length === 0 ? (
+              <EmptyState
+                title={searchQuery ? 'No reports match your search.' : 'No reports found.'}
+              />
+            ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -154,19 +185,7 @@ function SuperadminReportsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredReports.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-5 py-12 text-center text-sm text-muted-foreground"
-                      >
-                        {searchQuery
-                          ? 'No reports match your search.'
-                          : 'No reports found.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    paginatedReports.map((report, i) => (
+                  {paginatedReports.map((report, i) => (
                       <motion.tr
                         key={report.id}
                         initial={{ opacity: 0, x: -8 }}
@@ -209,6 +228,7 @@ function SuperadminReportsPage() {
                                 e.stopPropagation();
                                 handleDelete(report.id);
                               }}
+                              disabled={busy}
                               className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -216,14 +236,17 @@ function SuperadminReportsPage() {
                           )}
                         </td>
                       </motion.tr>
-                    ))
-                  )}
+                    ))}
                 </tbody>
               </table>
             </div>
+            )}
+            {actionError && !previewOpen && (
+              <p className="text-xs text-destructive">{actionError}</p>
+            )}
 
             {/* Pagination */}
-            {filteredReports.length > 0 && (
+            {!reportsReq.isLoading && !reportsReq.error && filteredReports.length > 0 && (
               <div className="flex items-center justify-between pt-2">
                 <p className="text-xs text-muted-foreground">
                   Showing{' '}
@@ -294,13 +317,15 @@ function SuperadminReportsPage() {
                 </p>
               </div>
 
+              {actionError && <p className="text-xs text-destructive">{actionError}</p>}
+
               <div className="flex items-center justify-between pt-2">
                 <DialogClose asChild>
                   <Button variant="outline">Close</Button>
                 </DialogClose>
                 {selectedReport.status === 'pending' && (
-                  <Button variant="gradient" onClick={handleResolve}>
-                    Resolve
+                  <Button variant="gradient" onClick={handleResolve} disabled={busy}>
+                    {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Resolve'}
                   </Button>
                 )}
               </div>

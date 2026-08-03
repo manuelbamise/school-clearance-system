@@ -32,7 +32,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { pastDocuments as initialDocuments } from '@/data/dummy';
+import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states';
+import { useAsync } from '@/hooks/use-async';
+import { getMyDocuments, uploadDocument } from '@/lib/api/documents.api';
+import { mapDocument } from '@/lib/api/mappers';
+import { errorMessage } from '@/lib/api/client';
+import type { ApiUnit } from '@/lib/api/types';
 import type { DocumentRecord } from '@/types';
 
 export const Route = createFileRoute('/_authenticated/student/document')({
@@ -43,16 +48,16 @@ interface DocumentFormData {
   name: string;
   level: string;
   session: string;
-  submittedTo: 'department' | 'academic' | 'bursary';
+  unit: ApiUnit;
 }
 
 function StudentDocumentPage() {
-  const [documents, setDocuments] =
-    useState<DocumentRecord[]>(initialDocuments);
+  const docs = useAsync(async () => (await getMyDocuments({ limit: 100 })).documents.map(mapDocument), []);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [forms, setForms] = useState<DocumentFormData[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [resubmitDoc, setResubmitDoc] = useState<DocumentRecord | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
@@ -60,6 +65,8 @@ function StudentDocumentPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalFileRef = useRef<HTMLInputElement>(null);
   const ITEMS_PER_PAGE = 5;
+
+  const documents = docs.data ?? [];
 
   const handleModalFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -97,12 +104,13 @@ function StudentDocumentPage() {
   const openResubmit = (doc: DocumentRecord) => {
     setResubmitDoc(doc);
     setSelectedFiles([]);
+    setUploadError(null);
     setForms([
       {
         name: doc.name,
         level: doc.level,
         session: doc.session,
-        submittedTo: doc.submittedTo,
+        unit: doc.submittedTo,
       },
     ]);
     setUploadModalOpen(true);
@@ -118,7 +126,7 @@ function StudentDocumentPage() {
         name: f.name.replace(/\.pdf$/i, ''),
         level: '',
         session: '',
-        submittedTo: 'department' as const,
+        unit: 'department' as ApiUnit,
       })),
     );
     setUploadModalOpen(true);
@@ -140,46 +148,32 @@ function StudentDocumentPage() {
     });
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     setUploading(true);
-    setTimeout(() => {
-      if (resubmitDoc) {
-        setDocuments((prev) =>
-          prev.map((d) =>
-            d.id === resubmitDoc.id
-              ? {
-                  ...d,
-                  name: forms[0]?.name || d.name,
-                  level: forms[0]?.level || d.level,
-                  session: forms[0]?.session || d.session,
-                  submittedTo: forms[0]?.submittedTo || d.submittedTo,
-                  status: 'pending' as const,
-                  date: new Date().toISOString().split('T')[0],
-                }
-              : d,
-          ),
-        );
-        setResubmitDoc(null);
-      } else {
-        const newDocs: DocumentRecord[] = forms.map((form, i) => ({
-          id: `d-${Date.now()}-${i}`,
-          name:
-            form.name ||
-            selectedFiles[i]?.name.replace(/\.pdf$/i, '') ||
-            'Untitled',
-          level: form.level || 'N/A',
-          session: form.session || 'N/A',
-          submittedTo: form.submittedTo,
-          status: 'pending' as const,
-          date: new Date().toISOString().split('T')[0],
-        }));
-        setDocuments((prev) => [...newDocs, ...prev]);
+    setUploadError(null);
+    try {
+      for (let i = 0; i < forms.length; i++) {
+        const form = forms[i];
+        const file = selectedFiles[i];
+        if (!form.name.trim() || !file) continue;
+        const data = new FormData();
+        data.append('name', form.name.trim());
+        data.append('level', form.level);
+        data.append('session', form.session);
+        data.append('unit', form.unit);
+        data.append('file', file);
+        await uploadDocument(data);
       }
-      setUploading(false);
+      await docs.refetch();
       setUploadModalOpen(false);
+      setResubmitDoc(null);
       setSelectedFiles([]);
       setForms([]);
-    }, 1200);
+    } catch (err) {
+      setUploadError(errorMessage(err));
+    } finally {
+      setUploading(false);
+    }
   };
 
   const removeFile = (index: number) => {
@@ -252,6 +246,7 @@ function StudentDocumentPage() {
           setResubmitDoc(null);
           setSelectedFiles([]);
           setForms([]);
+          setUploadError(null);
         }
         setUploadModalOpen(open);
       }}>
@@ -266,7 +261,7 @@ function StudentDocumentPage() {
             </DialogTitle>
             <DialogDescription>
               {resubmitDoc
-                ? 'Update the details and resubmit your document.'
+                ? 'Upload a corrected version of your document.'
                 : bulkMode
                   ? 'Review and fill in details for each document before uploading.'
                   : 'Fill in the document details below.'}
@@ -343,10 +338,8 @@ function StudentDocumentPage() {
                 <div className="space-y-2">
                   <Label>Send To</Label>
                   <Select
-                    value={form.submittedTo}
-                    onValueChange={(
-                      val: 'department' | 'academic' | 'bursary',
-                    ) => updateForm(i, 'submittedTo', val)}
+                    value={form.unit}
+                    onValueChange={(val: ApiUnit) => updateForm(i, 'unit', val)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select department" />
@@ -398,6 +391,10 @@ function StudentDocumentPage() {
             ))}
           </div>
 
+          {uploadError && (
+            <p className="text-xs text-destructive">{uploadError}</p>
+          )}
+
           <div className="flex items-center justify-between pt-2">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
@@ -406,7 +403,7 @@ function StudentDocumentPage() {
               variant="gradient"
               className="gap-2"
               onClick={handleUpload}
-              disabled={uploading}
+              disabled={uploading || forms.length === 0}
             >
               {uploading ? (
                 <>
@@ -470,41 +467,39 @@ function StudentDocumentPage() {
               />
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Document Name
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Level
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Session
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Submitted To
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredDocuments.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-5 py-12 text-center text-sm text-muted-foreground"
-                      >
-                        {searchQuery
-                          ? 'No documents match your search.'
-                          : 'No documents uploaded yet.'}
-                      </td>
+            {docs.isLoading ? (
+              <TableSkeleton rows={4} cols={5} />
+            ) : docs.error ? (
+              <ErrorState message={docs.error} onRetry={docs.refetch} />
+            ) : filteredDocuments.length === 0 ? (
+              <EmptyState
+                title={searchQuery || statusFilter !== 'all' ? 'No documents match your filters.' : 'No documents uploaded yet.'}
+                description={searchQuery || statusFilter !== 'all' ? undefined : 'Upload your first document to start your clearance.'}
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Document Name
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Level
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Session
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Submitted To
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Status
+                      </th>
                     </tr>
-                  ) : (
-                    paginatedDocuments.map((doc, i) => (
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {paginatedDocuments.map((doc, i) => (
                       <motion.tr
                         key={doc.id}
                         initial={{ opacity: 0, x: -8 }}
@@ -551,14 +546,14 @@ function StudentDocumentPage() {
                           </div>
                         </td>
                       </motion.tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             {/* Pagination */}
-            {filteredDocuments.length > 0 && (
+            {!docs.isLoading && !docs.error && filteredDocuments.length > 0 && (
               <div className="flex items-center justify-between pt-2">
                 <p className="text-xs text-muted-foreground">
                   Showing{' '}

@@ -75,7 +75,7 @@ const iconMap: Record<string, React.ElementType> = {
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { collapsed, toggle, mobileOpen, setMobileOpen } = useSidebar();
+  const { collapsed, mobileOpen, setMobileOpen } = useSidebar();
   const { user, logout } = useAuth();
 
   const role = user?.role as Role;

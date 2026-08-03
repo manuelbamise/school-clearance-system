@@ -78,7 +78,7 @@ export const create = async (
 
     return document;
   }).then(async (document) => {
-    await activitiesService.log(studentId, 'uploaded document', data.name, 'info');
+    await activitiesService.log(studentId, 'uploaded document', data.name, 'info', data.unit);
     return document;
   });
 };
@@ -161,6 +161,17 @@ export const getInbox = async (recipientId: string, params: {
   };
 };
 
+export const getById = async (id: string) => {
+  return prisma.document.findUnique({
+    where: { id },
+    include: {
+      student: { include: { department: true } },
+      recipient: { include: { department: true } },
+      reviewedBy: true,
+    },
+  });
+};
+
 export const review = async (
   id: string,
   data: ReviewDocumentInput,
@@ -213,6 +224,7 @@ export const review = async (
       data.status === 'approved' ? 'approved document' : 'rejected document',
       document.name,
       data.status === 'approved' ? 'success' : 'warning',
+      document.unit,
     );
     return document;
   });

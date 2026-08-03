@@ -6,7 +6,10 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { auditLogs as initialLogs } from '@/data/dummy';
+import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states';
+import { useAsync } from '@/hooks/use-async';
+import { getAuditLogs } from '@/lib/api/audit-logs.api';
+import { mapAuditLog } from '@/lib/api/mappers';
 import type { AuditLog } from '@/types';
 
 export const Route = createFileRoute('/_authenticated/superadmin/audit')({
@@ -33,7 +36,11 @@ const categoryBadge = (cat: AuditLog['category']) => {
 };
 
 function SuperadminAuditPage() {
-  const [logs] = useState<AuditLog[]>(initialLogs);
+  const logsReq = useAsync<AuditLog[]>(
+    async () => (await getAuditLogs({ limit: 100 })).logs.map(mapAuditLog),
+    [],
+  );
+  const logs = logsReq.data ?? [];
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,6 +123,15 @@ function SuperadminAuditPage() {
             </div>
 
             {/* Table */}
+            {logsReq.isLoading ? (
+              <TableSkeleton rows={4} cols={5} />
+            ) : logsReq.error ? (
+              <ErrorState message={logsReq.error} onRetry={logsReq.refetch} />
+            ) : filteredLogs.length === 0 ? (
+              <EmptyState
+                title={searchQuery ? 'No logs match your search.' : 'No activity logs found.'}
+              />
+            ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -138,19 +154,7 @@ function SuperadminAuditPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredLogs.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-5 py-12 text-center text-sm text-muted-foreground"
-                      >
-                        {searchQuery
-                          ? 'No logs match your search.'
-                          : 'No activity logs found.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    paginatedLogs.map((log, i) => (
+                  {paginatedLogs.map((log, i) => (
                       <motion.tr
                         key={log.id}
                         initial={{ opacity: 0, x: -8 }}
@@ -179,7 +183,7 @@ function SuperadminAuditPage() {
                           </div>
                         </td>
                         <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">
-                          {log.when}
+                          {new Date(log.when).toLocaleString()}
                         </td>
                         <td className="px-5 py-3.5 text-muted-foreground max-w-[220px]">
                           <span className="line-clamp-2">{log.why}</span>
@@ -192,14 +196,14 @@ function SuperadminAuditPage() {
                           </Badge>
                         </td>
                       </motion.tr>
-                    ))
-                  )}
+                    ))}
                 </tbody>
               </table>
             </div>
+            )}
 
             {/* Pagination */}
-            {filteredLogs.length > 0 && (
+            {!logsReq.isLoading && !logsReq.error && filteredLogs.length > 0 && (
               <div className="flex items-center justify-between pt-2">
                 <p className="text-xs text-muted-foreground">
                   Showing{' '}

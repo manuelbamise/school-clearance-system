@@ -19,6 +19,7 @@ documentsRouter.get(
   authorize('academic', 'bursary', 'department'),
   documentsController.getInbox,
 );
+documentsRouter.get('/:id', documentsController.getById);
 documentsRouter.patch(
   '/:id/review',
   authorize('academic', 'bursary', 'department'),

@@ -15,7 +15,7 @@ export interface CreateUserInput {
   role: ApiRole
   studentId?: string
   staffId?: string
-  departmentId?: string
+  departmentId?: string | null
 }
 
 export const getUsers = async (

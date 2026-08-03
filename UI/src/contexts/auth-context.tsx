@@ -10,6 +10,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: string }>
   logout: () => void
   isLoading: boolean
+  isHydrating: boolean
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -27,6 +29,7 @@ const readStoredUser = (): User | null => {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(readStoredUser)
   const [isLoading, setIsLoading] = useState(false)
+  const [isHydrating, setIsHydrating] = useState(() => Boolean(getToken()))
 
   useEffect(() => {
     if (!getToken()) return
@@ -43,6 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return
         clearAuth()
         setUser(null)
+      })
+      .finally(() => {
+        if (!cancelled) setIsHydrating(false)
       })
     return () => {
       cancelled = true
@@ -70,8 +76,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearAuth()
   }, [])
 
+  const refreshUser = useCallback(async () => {
+    const apiUser = await authApi.getMe()
+    const mapped = mapUser(apiUser)
+    setUser(mapped)
+    localStorage.setItem(USER_KEY, JSON.stringify(mapped))
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, isHydrating, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

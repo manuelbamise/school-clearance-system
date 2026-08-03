@@ -1,4 +1,3 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send, Loader2, CheckCircle } from 'lucide-react'
@@ -9,11 +8,7 @@ import { Button } from '@/components/ui/button'
 import { createReport } from '@/lib/api/reports.api'
 import { errorMessage } from '@/lib/api/client'
 
-export const Route = createFileRoute('/_authenticated/student/report')({
-  component: StudentReportPage,
-})
-
-function StudentReportPage() {
+export default function UnitReportPage() {
   const [title, setTitle] = useState('')
   const [complaint, setComplaint] = useState('')
   const [sending, setSending] = useState(false)
@@ -40,10 +35,7 @@ function StudentReportPage() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-foreground">Submit a Report</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Use this form to send a complaint or report directly to the Super Admin.
@@ -58,9 +50,7 @@ function StudentReportPage() {
         <Card>
           <CardHeader>
             <CardTitle>Report Details</CardTitle>
-            <CardDescription>
-              Provide a clear title and detailed description of your issue.
-            </CardDescription>
+            <CardDescription>Provide a clear title and detailed description of your issue.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -88,9 +78,7 @@ function StudentReportPage() {
                 />
               </div>
 
-              {error && (
-                <p className="text-xs text-destructive">{error}</p>
-              )}
+              {error && <p className="text-xs text-destructive">{error}</p>}
 
               <div className="flex justify-end">
                 <Button

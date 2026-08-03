@@ -43,15 +43,6 @@ export interface Activity {
   type?: 'info' | 'success' | 'warning' | 'error';
 }
 
-export interface ScheduleEvent {
-  id: string;
-  title: string;
-  time: string;
-  duration: string;
-  location?: string;
-  type: 'class' | 'meeting' | 'appointment' | 'task';
-}
-
 export interface QuickAction {
   label: string;
   icon: string;
@@ -80,13 +71,6 @@ export interface ClearanceStep {
   clearedBy?: string
   clearedAt?: string
   icon: string
-}
-
-export interface ClearanceHistoryItem {
-  unit: string
-  status: 'cleared' | 'pending'
-  clearedBy: string
-  date: string
 }
 
 export interface Department {
@@ -141,17 +125,9 @@ export interface SubmittedDocument {
 
 export interface ClearanceRequest {
   id: string;
+  userId?: string;
   studentName: string;
   studentId: string;
   department: string;
   cleared: boolean;
-}
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  type: 'info' | 'success' | 'warning' | 'error';
 }

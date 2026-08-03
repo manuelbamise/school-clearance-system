@@ -150,11 +150,11 @@ async function main() {
   console.log(`Created ${sampleReports.length} sample reports`);
 
   const sampleActivities = [
-    { actorEmail: 'academic@portal.test', action: 'uploaded', target: 'CS 301 Assignment', type: 'info' },
+    { actorEmail: 'academic@portal.test', action: 'uploaded', target: 'CS 301 Assignment', type: 'info', unit: 'academic' },
     { actorEmail: 'student@portal.test', action: 'submitted', target: 'Physics Lab Report', type: 'success' },
-    { actorEmail: 'bursary@portal.test', action: 'processed', target: 'Tuition Payment #4452', type: 'success' },
-    { actorEmail: 'department@portal.test', action: 'approved', target: 'Clearance #1023', type: 'info' },
-    { actorEmail: 'academic@portal.test', action: 'scheduled', target: 'Department Meeting', type: 'info' },
+    { actorEmail: 'bursary@portal.test', action: 'processed', target: 'Tuition Payment #4452', type: 'success', unit: 'bursary' },
+    { actorEmail: 'department@portal.test', action: 'approved', target: 'Clearance #1023', type: 'info', unit: 'department' },
+    { actorEmail: 'academic@portal.test', action: 'scheduled', target: 'Department Meeting', type: 'info', unit: 'academic' },
   ];
 
   for (const activity of sampleActivities) {
@@ -164,13 +164,14 @@ async function main() {
     if (actor) {
       await prisma.activity.upsert({
         where: { id: `seed-${activity.action}-${activity.target.replace(/\s+/g, '-').toLowerCase()}` },
-        update: {},
+        update: { unit: (activity as { unit?: string }).unit ?? null },
         create: {
           id: `seed-${activity.action}-${activity.target.replace(/\s+/g, '-').toLowerCase()}`,
           actorId: actor.id,
           action: activity.action,
           target: activity.target,
           type: activity.type,
+          unit: (activity as { unit?: string }).unit ?? null,
         },
       });
     }

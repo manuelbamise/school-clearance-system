@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Camera, Save, Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/auth-context'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -9,8 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
+import { updateUser } from '@/lib/api/users.api'
+import { errorMessage } from '@/lib/api/client'
 import type { Role } from '@/types'
 
 const roleLabels: Record<string, string> = {
@@ -22,31 +22,42 @@ const roleLabels: Record<string, string> = {
 }
 
 export default function ProfilePage({ role }: { role: Role }) {
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
+  const isAdmin = role === 'superadmin'
+  const [name, setName] = useState(user?.name ?? '')
+  const [email, setEmail] = useState(user?.email ?? '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   if (!user) return null
 
   const initials = user.name.split(' ').map((n) => n[0]).join('').slice(0, 2)
-
-  const handleSave = () => {
-    setSaving(true)
-    setTimeout(() => {
-      setSaving(false)
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2000)
-    }, 1000)
-  }
-
   const isStaff = role !== 'student'
   const roleLabel = roleLabels[role] || role
+
+  const hasChanges = name.trim() !== user.name || email.trim() !== user.email
+
+  const handleSave = async () => {
+    setSaving(true)
+    setError(null)
+    try {
+      await updateUser(user.id, { name: name.trim(), email: email.trim() })
+      await refreshUser()
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-foreground">My Profile</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your personal information and security settings.</p>
+        <p className="text-sm text-muted-foreground mt-1">Manage your personal information.</p>
       </motion.div>
 
       {/* Profile Header */}
@@ -111,31 +122,55 @@ export default function ProfilePage({ role }: { role: Role }) {
           <Card>
             <CardHeader>
               <CardTitle>Personal Details</CardTitle>
-              <CardDescription>Update your personal information</CardDescription>
+              <CardDescription>
+                {isAdmin
+                  ? 'Update your name and email address'
+                  : 'Your details are managed by the Super Admin'}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>First Name</Label>
-                  <Input defaultValue={user.name.split(' ')[0]} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Last Name</Label>
-                  <Input defaultValue={user.name.split(' ').slice(1).join(' ')} />
-                </div>
+              <div className="space-y-2">
+                <Label>Full Name</Label>
+                <Input
+                  value={name}
+                  disabled={!isAdmin}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Email</Label>
-                <Input defaultValue={user.email} type="email" />
+                <Input value={email} type="email" disabled={!isAdmin} onChange={(e) => setEmail(e.target.value)} />
               </div>
-              <div className="space-y-2">
-                <Label>Phone</Label>
-                <Input defaultValue={user.phone || '+1 234 567 890'} />
-              </div>
-              <div className="space-y-2">
-                <Label>Address</Label>
-                <Input defaultValue={user.address || '123 Campus Drive'} />
-              </div>
+              {!isAdmin && (
+                <p className="text-xs text-muted-foreground">
+                  To update your details, please contact the Super Admin.
+                </p>
+              )}
+              {error && <p className="text-xs text-destructive">{error}</p>}
+              {isAdmin && (
+                <div className="flex justify-end pt-2">
+                  <Button onClick={handleSave} variant="gradient" className="gap-2" disabled={saving || !hasChanges}>
+                    {saving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : saved ? (
+                      <>
+                        <span className="h-4 w-4 rounded-full bg-white/30 flex items-center justify-center">
+                          <span className="text-[10px]">✓</span>
+                        </span>
+                        Saved
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
@@ -151,22 +186,24 @@ export default function ProfilePage({ role }: { role: Role }) {
           <Card>
             <CardHeader>
               <CardTitle>Security</CardTitle>
-              <CardDescription>Update your password</CardDescription>
+              <CardDescription>Password management is currently disabled</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Current Password</Label>
-                <Input type="password" placeholder="Enter current password" />
+                <Input type="password" placeholder="Enter current password" disabled />
               </div>
               <div className="space-y-2">
                 <Label>New Password</Label>
-                <Input type="password" placeholder="Enter new password" />
+                <Input type="password" placeholder="Enter new password" disabled />
               </div>
               <div className="space-y-2">
                 <Label>Confirm New Password</Label>
-                <Input type="password" placeholder="Confirm new password" />
+                <Input type="password" placeholder="Confirm new password" disabled />
               </div>
-              <Button variant="outline" size="sm">Change Password</Button>
+              <Button variant="outline" size="sm" disabled>
+                Change Password
+              </Button>
             </CardContent>
           </Card>
 
@@ -214,50 +251,19 @@ export default function ProfilePage({ role }: { role: Role }) {
         <Card>
           <CardHeader>
             <CardTitle>Notification Preferences</CardTitle>
-            <CardDescription>Manage how you receive notifications</CardDescription>
+            <CardDescription>Email notifications will be available soon</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {[
-              { label: 'Email Notifications', desc: 'Receive notifications via email' },
-              { label: 'Push Notifications', desc: 'Receive push notifications in browser' },
-              { label: 'SMS Alerts', desc: 'Get important alerts via SMS' },
-              { label: 'Weekly Digest', desc: 'Receive a weekly summary of activities' },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">{item.label}</p>
-                  <p className="text-xs text-muted-foreground">{item.desc}</p>
-                </div>
-                <Switch defaultChecked={item.label === 'Email Notifications'} />
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Email Notifications</p>
+                <p className="text-xs text-muted-foreground">Receive notifications via email</p>
               </div>
-            ))}
+              <Switch defaultChecked disabled />
+            </div>
           </CardContent>
         </Card>
       </motion.div>
-
-      {/* Save */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} variant="gradient" className="gap-2" disabled={saving}>
-          {saving ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : saved ? (
-            <>
-              <span className="h-4 w-4 rounded-full bg-white/30 flex items-center justify-center">
-                <span className="text-[10px]">✓</span>
-              </span>
-              Saved
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4" />
-              Save Changes
-            </>
-          )}
-        </Button>
-      </div>
     </div>
   )
 }

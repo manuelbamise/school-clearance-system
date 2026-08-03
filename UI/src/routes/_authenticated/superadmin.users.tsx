@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, ChevronLeft, ChevronRight, Building2, UserPlus, Trash2 } from 'lucide-react';
+import { Search, Plus, ChevronLeft, ChevronRight, Building2, UserPlus, Trash2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,8 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { departments as initialDepartments, userRecords as initialUsers } from '@/data/dummy';
-import type { Department, UserRecord } from '@/types';
+import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states';
+import { useAsync } from '@/hooks/use-async';
+import { getDepartments, createDepartment, deleteDepartment } from '@/lib/api/departments.api';
+import { getUsers, createUser, updateUser, deleteUser } from '@/lib/api/users.api';
+import { mapUserRecord, toApiRole } from '@/lib/api/mappers';
+import { errorMessage } from '@/lib/api/client';
+import type { Department, UserRecord, Role } from '@/types';
 
 export const Route = createFileRoute('/_authenticated/superadmin/users')({
   component: SuperadminUsersPage,
@@ -51,8 +56,18 @@ const roleLabel = (role: string) => {
 };
 
 function SuperadminUsersPage() {
-  const [departments, setDepartments] = useState<Department[]>(initialDepartments);
-  const [users, setUsers] = useState<UserRecord[]>(initialUsers);
+  const departmentsReq = useAsync<Department[]>(async () => {
+    const list = await getDepartments();
+    return list.map((d) => ({ id: d.id, name: d.name, userCount: d.userCount }));
+  }, []);
+  const usersReq = useAsync<UserRecord[]>(async () => {
+    const { users } = await getUsers({ limit: 100 });
+    return users.map(mapUserRecord);
+  }, []);
+
+  const departments = departmentsReq.data ?? [];
+  const users = usersReq.data ?? [];
+
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,13 +78,15 @@ function SuperadminUsersPage() {
   const [deptName, setDeptName] = useState('');
   const [deptPage, setDeptPage] = useState(1);
   const DEPTS_PER_PAGE = 4;
+  const [busy, setBusy] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   // User modal
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
-    role: 'student',
+    role: 'student' as Role,
     department: '',
     studentId: '',
     staffId: '',
@@ -79,36 +96,23 @@ function SuperadminUsersPage() {
   const [editUserOpen, setEditUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserRecord | null>(null);
   const [editedUser, setEditedUser] = useState<UserRecord | null>(null);
+  const [editDeptId, setEditDeptId] = useState('');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  const handleCreateDepartment = () => {
+  const handleCreateDepartment = async () => {
     if (!deptName.trim()) return;
-    setDepartments((prev) => [
-      ...prev,
-      { id: `dept-${Date.now()}`, name: deptName.trim(), userCount: 0 },
-    ]);
-    setDeptName('');
-    setDepartmentModalOpen(false);
-  };
-
-  const handleCreateUser = () => {
-    if (!newUser.name.trim() || !newUser.email.trim() || !newUser.department) return;
-    const record: UserRecord = {
-      id: `u-${Date.now()}`,
-      name: newUser.name.trim(),
-      email: newUser.email.trim(),
-      role: newUser.role,
-      department: newUser.department,
-      lastActive: new Date().toISOString().split('T')[0],
-    };
-    if (newUser.role === 'student') {
-      record.studentId = newUser.studentId || '-';
-    } else {
-      record.staffId = newUser.staffId || '-';
+    setBusy(true);
+    setModalError(null);
+    try {
+      await createDepartment(deptName.trim());
+      await departmentsReq.refetch();
+      setDeptName('');
+      setDepartmentModalOpen(false);
+    } catch (err) {
+      setModalError(errorMessage(err));
+    } finally {
+      setBusy(false);
     }
-    setUsers((prev) => [record, ...prev]);
-    setNewUser({ name: '', email: '', role: 'student', department: '', studentId: '', staffId: '' });
-    setUserModalOpen(false);
   };
 
   const paginatedDepartments = departments.slice(
@@ -117,15 +121,24 @@ function SuperadminUsersPage() {
   );
   const deptTotalPages = Math.max(1, Math.ceil(departments.length / DEPTS_PER_PAGE));
 
-  const handleDeleteDepartment = (id: string) => {
-    setDepartments((prev) => prev.filter((d) => d.id !== id));
-    const maxPage = Math.max(1, Math.ceil((departments.length - 1) / DEPTS_PER_PAGE));
-    if (deptPage > maxPage) setDeptPage(maxPage);
+  const handleDeleteDepartment = async (id: string) => {
+    setBusy(true);
+    try {
+      await deleteDepartment(id);
+      await departmentsReq.refetch();
+      const maxPage = Math.max(1, Math.ceil((departments.length - 1) / DEPTS_PER_PAGE));
+      if (deptPage > maxPage) setDeptPage(maxPage);
+    } catch (err) {
+      setModalError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const openEditUser = (user: UserRecord) => {
     setSelectedUser(user);
     setEditedUser({ ...user });
+    setEditDeptId(departments.find((d) => d.name === user.department)?.id ?? '');
     setEditUserOpen(true);
   };
 
@@ -133,6 +146,7 @@ function SuperadminUsersPage() {
     setEditUserOpen(false);
     setSelectedUser(null);
     setEditedUser(null);
+    setEditDeptId('');
   };
 
   const hasChanges = useMemo(() => {
@@ -143,21 +157,75 @@ function SuperadminUsersPage() {
       editedUser.role !== selectedUser.role ||
       editedUser.department !== selectedUser.department ||
       editedUser.studentId !== selectedUser.studentId ||
-      editedUser.staffId !== selectedUser.staffId
+      editedUser.staffId !== selectedUser.staffId ||
+      editDeptId !== (departments.find((d) => d.name === selectedUser.department)?.id ?? '')
     );
-  }, [selectedUser, editedUser]);
+  }, [selectedUser, editedUser, editDeptId, departments]);
 
-  const handleUpdateUser = () => {
-    if (!editedUser) return;
-    setUsers((prev) => prev.map((u) => (u.id === editedUser.id ? editedUser : u)));
-    closeEdit();
+  const handleCreateUser = async () => {
+    if (!newUser.name.trim() || !newUser.email.trim()) return;
+    setBusy(true);
+    setModalError(null);
+    try {
+      await createUser({
+        email: newUser.email.trim(),
+        password: 'password123',
+        name: newUser.name.trim(),
+        role: toApiRole(newUser.role),
+        departmentId: newUser.department || null,
+        ...(newUser.role === 'student'
+          ? { studentId: newUser.studentId.trim() || undefined }
+          : { staffId: newUser.staffId.trim() || undefined }),
+      });
+      await usersReq.refetch();
+      setNewUser({ name: '', email: '', role: 'student', department: '', studentId: '', staffId: '' });
+      setUserModalOpen(false);
+    } catch (err) {
+      setModalError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const handleDeleteUser = () => {
+  const handleUpdateUser = async () => {
+    if (!editedUser) return;
+    setBusy(true);
+    setModalError(null);
+    try {
+      await updateUser(editedUser.id, {
+        name: editedUser.name,
+        email: editedUser.email,
+        role: toApiRole(editedUser.role as Role),
+        departmentId: editDeptId || null,
+        ...(editedUser.role === 'student'
+          ? { studentId: editedUser.studentId || undefined }
+          : { staffId: editedUser.staffId || undefined }),
+      });
+      await usersReq.refetch();
+      closeEdit();
+    } catch (err) {
+      setModalError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
     if (!selectedUser) return;
-    setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id));
-    setDeleteConfirmOpen(false);
-    closeEdit();
+    setBusy(true);
+    setModalError(null);
+    try {
+      await deleteUser(selectedUser.id);
+      await usersReq.refetch();
+      setDeleteConfirmOpen(false);
+      closeEdit();
+    } catch (err) {
+      setModalError(errorMessage(err));
+      setDeleteConfirmOpen(false);
+      setEditUserOpen(true);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const filteredUsers = useMemo(
@@ -214,36 +282,45 @@ function SuperadminUsersPage() {
             </Button>
           </CardHeader>
           <CardContent className="p-5 pt-0">
-            <div className="divide-y divide-border rounded-lg border border-border">
-              {paginatedDepartments.map((dept) => (
-                <div
-                  key={dept.id}
-                  className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-muted/20"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Building2 className="h-4 w-4" />
+            {departmentsReq.isLoading ? (
+              <TableSkeleton rows={4} cols={2} />
+            ) : departmentsReq.error ? (
+              <ErrorState message={departmentsReq.error} onRetry={departmentsReq.refetch} />
+            ) : departments.length === 0 ? (
+              <EmptyState title="No departments yet" description="Create your first department." />
+            ) : (
+              <div className="divide-y divide-border rounded-lg border border-border">
+                {paginatedDepartments.map((dept) => (
+                  <div
+                    key={dept.id}
+                    className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-muted/20"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Building2 className="h-4 w-4" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">
+                        {dept.name}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-foreground">
-                      {dept.name}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteDepartment(dept.id);
+                        }}
+                        disabled={busy}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                      <Badge variant="secondary">{dept.userCount} Users</Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteDepartment(dept.id);
-                      }}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                    <Badge variant="secondary">{dept.userCount} Users</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {departments.length > DEPTS_PER_PAGE && (
+                ))}
+              </div>
+            )}
+            {!departmentsReq.isLoading && !departmentsReq.error && departments.length > DEPTS_PER_PAGE && (
               <div className="flex items-center justify-between pt-3">
                 <p className="text-xs text-muted-foreground">
                   Showing {(deptPage - 1) * DEPTS_PER_PAGE + 1}–
@@ -332,38 +409,35 @@ function SuperadminUsersPage() {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Name
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Role
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Department
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Last Active
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredUsers.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="px-5 py-12 text-center text-sm text-muted-foreground"
-                      >
-                        {searchQuery
-                          ? 'No users match your search.'
-                          : 'No users found.'}
-                      </td>
+            {usersReq.isLoading ? (
+              <TableSkeleton rows={4} cols={4} />
+            ) : usersReq.error ? (
+              <ErrorState message={usersReq.error} onRetry={usersReq.refetch} />
+            ) : filteredUsers.length === 0 ? (
+              <EmptyState
+                title={searchQuery ? 'No users match your search.' : 'No users found.'}
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Name
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Role
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Department
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Last Active
+                      </th>
                     </tr>
-                  ) : (
-                    paginatedUsers.map((user, i) => (
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {paginatedUsers.map((user, i) => (
                       <motion.tr
                         key={user.id}
                         initial={{ opacity: 0, x: -8 }}
@@ -402,20 +476,20 @@ function SuperadminUsersPage() {
                           </Badge>
                         </td>
                         <td className="px-5 py-3.5 text-muted-foreground">
-                          {user.department}
+                          {user.department || '—'}
                         </td>
                         <td className="px-5 py-3.5 text-muted-foreground">
-                          {user.lastActive}
+                          {new Date(user.lastActive).toLocaleDateString()}
                         </td>
                       </motion.tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             {/* Pagination */}
-            {filteredUsers.length > 0 && (
+            {!usersReq.isLoading && !usersReq.error && filteredUsers.length > 0 && (
               <div className="flex items-center justify-between pt-2">
                 <p className="text-xs text-muted-foreground">
                   Showing{' '}
@@ -474,6 +548,7 @@ function SuperadminUsersPage() {
                 placeholder="e.g. Computer Science"
               />
             </div>
+            {modalError && <p className="text-xs text-destructive">{modalError}</p>}
             <div className="flex items-center justify-between pt-2">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
@@ -481,9 +556,9 @@ function SuperadminUsersPage() {
               <Button
                 variant="gradient"
                 onClick={handleCreateDepartment}
-                disabled={!deptName.trim()}
+                disabled={!deptName.trim() || busy}
               >
-                Create
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create'}
               </Button>
             </div>
           </div>
@@ -528,7 +603,7 @@ function SuperadminUsersPage() {
                   onValueChange={(val) =>
                     setNewUser((p) => ({
                       ...p,
-                      role: val,
+                      role: val as Role,
                       studentId: '',
                       staffId: '',
                     }))
@@ -560,7 +635,7 @@ function SuperadminUsersPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {departments.map((d) => (
-                      <SelectItem key={d.id} value={d.name}>
+                      <SelectItem key={d.id} value={d.id}>
                         {d.name}
                       </SelectItem>
                     ))}
@@ -591,6 +666,7 @@ function SuperadminUsersPage() {
                 />
               </div>
             )}
+            {modalError && <p className="text-xs text-destructive">{modalError}</p>}
             <div className="flex items-center justify-between pt-2">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
@@ -598,13 +674,9 @@ function SuperadminUsersPage() {
               <Button
                 variant="gradient"
                 onClick={handleCreateUser}
-                disabled={
-                  !newUser.name.trim() ||
-                  !newUser.email.trim() ||
-                  !newUser.department
-                }
+                disabled={!newUser.name.trim() || !newUser.email.trim() || busy}
               >
-                Create User
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create User'}
               </Button>
             </div>
           </div>
@@ -680,19 +752,15 @@ function SuperadminUsersPage() {
                 <div className="space-y-2">
                   <Label>Department</Label>
                   <Select
-                    value={editedUser.department}
-                    onValueChange={(val) =>
-                      setEditedUser((p) =>
-                        p ? { ...p, department: val } : p,
-                      )
-                    }
+                    value={editDeptId}
+                    onValueChange={setEditDeptId}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       {departments.map((d) => (
-                        <SelectItem key={d.id} value={d.name}>
+                        <SelectItem key={d.id} value={d.id}>
                           {d.name}
                         </SelectItem>
                       ))}
@@ -725,6 +793,7 @@ function SuperadminUsersPage() {
                   />
                 </div>
               )}
+              {modalError && <p className="text-xs text-destructive">{modalError}</p>}
               <div className="flex items-center justify-between pt-2">
                 <Button
                   variant="destructive"
@@ -738,9 +807,9 @@ function SuperadminUsersPage() {
                 <Button
                   variant="gradient"
                   onClick={handleUpdateUser}
-                  disabled={!hasChanges}
+                  disabled={!hasChanges || busy}
                 >
-                  Update
+                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update'}
                 </Button>
               </div>
             </div>
@@ -767,8 +836,8 @@ function SuperadminUsersPage() {
             >
               No
             </Button>
-            <Button variant="destructive" onClick={handleDeleteUser}>
-              Yes
+            <Button variant="destructive" onClick={handleDeleteUser} disabled={busy}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Yes'}
             </Button>
           </div>
         </DialogContent>

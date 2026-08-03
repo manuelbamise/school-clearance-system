@@ -17,8 +17,10 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+    const role = (req.user as { role: string }).role;
+    const userId = (req.user as { id: string }).id;
 
-    const { activities, meta } = await activitiesService.getAll({ page, limit });
+    const { activities, meta } = await activitiesService.getAll(role, userId, { page, limit });
     res.json({ status: 'success', data: activities.map(sanitize), meta });
   } catch (err) {
     next(err);
