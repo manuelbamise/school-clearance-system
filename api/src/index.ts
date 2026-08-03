@@ -15,7 +15,15 @@ const PORT = process.env.PORT || 3000;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') ?? true }));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN?.split(',') ?? true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
 app.use(express.json());
 app.use(passport.initialize());
 app.use('/uploads', express.static(uploadsDirPath));
