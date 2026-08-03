@@ -20,7 +20,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const getById = async (req: Request, res: Response, next: NextFunction) => {
+export const getById = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const user = await usersService.getById(req.params.id);
     if (!user) {
@@ -43,7 +43,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const update = async (req: Request, res: Response, next: NextFunction) => {
+export const update = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const data = updateUserSchema.parse(req.body);
     const performedByUserId = (req.user as { id: string }).id;
@@ -54,7 +54,7 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const remove = async (req: Request, res: Response, next: NextFunction) => {
+export const remove = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const performedByUserId = (req.user as { id: string }).id;
     await usersService.remove(req.params.id, performedByUserId, req.ip);

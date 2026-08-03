@@ -11,7 +11,10 @@ passport.use(
     { usernameField: 'email', session: false },
     async (email, password, done) => {
       try {
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({
+          where: { email },
+          include: { department: true },
+        });
         if (!user) {
           return done(null, false, { message: 'Invalid credentials' });
         }
@@ -35,7 +38,10 @@ passport.use(
     },
     async (payload, done) => {
       try {
-        const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+        const user = await prisma.user.findUnique({
+          where: { id: payload.sub },
+          include: { department: true },
+        });
         if (!user) return done(null, false);
         return done(null, user);
       } catch (err) {

@@ -1,29 +1,50 @@
-import axios from 'axios'
+import axios, { type AxiosError, type AxiosInstance } from 'axios'
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
-  timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
+export const API_BASE_URL =
+  (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:3300/api'
+
+export const TOKEN_KEY = 'auth_token'
+export const USER_KEY = 'auth_user'
+
+export const getToken = () => localStorage.getItem(TOKEN_KEY)
+export const setToken = (token: string) => localStorage.setItem(TOKEN_KEY, token)
+export const clearAuth = () => {
+  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(USER_KEY)
+}
+
+export const apiClient: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
 })
 
-api.interceptors.request.use((config) => {
-  const stored = localStorage.getItem('auth_user')
-  if (stored) {
-    const user = JSON.parse(stored)
-    config.headers.Authorization = `Bearer ${user.id}`
+apiClient.interceptors.request.use((config) => {
+  const token = getToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json'
   }
   return config
 })
 
-api.interceptors.response.use(
+apiClient.interceptors.response.use(
   (res) => res,
-  (err) => {
+  (err: AxiosError) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('auth_user')
-      window.location.href = '/login'
+      clearAuth()
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(err)
-  }
+  },
 )
 
-export default api
+export const assetUrl = (path?: string | null) => {
+  if (!path) return ''
+  if (/^https?:\/\//.test(path)) return path
+  const origin = API_BASE_URL.replace(/\/api\/?$/, '')
+  return `${origin}${path.startsWith('/') ? path : `/${path}`}`
+}

@@ -28,7 +28,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const remove = async (req: Request, res: Response, next: NextFunction) => {
+export const remove = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   try {
     const performedByUserId = (req.user as { id: string }).id;
     await departmentsService.remove(req.params.id, performedByUserId, req.ip);

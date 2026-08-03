@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') ?? true }));
 app.use(express.json());
 app.use(passport.initialize());
 app.use('/uploads', express.static(uploadsDirPath));

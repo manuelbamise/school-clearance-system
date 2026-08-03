@@ -88,22 +88,6 @@ const swaggerSpec = {
           },
         },
       },
-      RegisterInput: {
-        type: 'object',
-        required: ['email', 'password', 'name', 'role'],
-        properties: {
-          email: { type: 'string', format: 'email', example: 'user@portal.test' },
-          password: { type: 'string', format: 'password', minLength: 8, example: 'password123' },
-          name: { type: 'string', example: 'John Doe' },
-          role: {
-            type: 'string',
-            enum: ['student', 'superAdmin', 'academic', 'bursary', 'department'],
-          },
-          studentId: { type: 'string', example: 'STU001' },
-          staffId: { type: 'string', example: 'STA001' },
-          departmentId: { type: 'string' },
-        },
-      },
       LoginInput: {
         type: 'object',
         required: ['email', 'password'],
@@ -332,48 +316,6 @@ const swaggerSpec = {
                     message: { type: 'string', example: 'Server is running well' },
                   },
                 },
-              },
-            },
-          },
-        },
-      },
-    },
-
-    '/auth/register': {
-      post: {
-        tags: ['Auth'],
-        summary: 'Register a new user',
-        description: 'Creates a new user account and returns a JWT token.',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/RegisterInput' },
-            },
-          },
-        },
-        responses: {
-          '201': {
-            description: 'User registered successfully',
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/AuthResponse' },
-              },
-            },
-          },
-          '400': {
-            description: 'Validation error',
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/ErrorResponse' },
-              },
-            },
-          },
-          '409': {
-            description: 'Email already exists',
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/ErrorResponse' },
               },
             },
           },

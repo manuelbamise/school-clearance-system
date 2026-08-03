@@ -1,46 +1,8 @@
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
 import * as activitiesService from '../activities/activities.service.js';
-import type { RegisterInput } from './auth.validation.js';
 
-const SALT_ROUNDS = 12;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
-
-export const register = async (data: RegisterInput, ipAddress?: string) => {
-  const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
-
-  const result = await prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: {
-        email: data.email,
-        password: hashedPassword,
-        name: data.name,
-        role: data.role,
-        studentId: data.studentId,
-        staffId: data.staffId,
-        departmentId: data.departmentId ?? null,
-      },
-    });
-
-    await tx.auditLog.create({
-      data: {
-        userId: user.id,
-        action: 'User registered',
-        reason: `New ${data.role} account created`,
-        category: 'login',
-        status: 'success',
-        ipAddress: ipAddress ?? null,
-      },
-    });
-
-    const token = generateToken(user);
-    return { user, token };
-  });
-
-  activitiesService.log(result.user.id, 'registered', '', 'success');
-  return result;
-};
 
 export const logLogin = async (userId: string, ipAddress?: string) => {
   await prisma.auditLog.create({
