@@ -48,6 +48,12 @@ export default function LandingFaq() {
 
   return (
     <section className="lp-section lp-faq" id="faq">
+      <div className="lp-faq-diagram">
+        <div className="lp-faq-diagram-ring" style={{ width: 520, height: 520 }} />
+        <div className="lp-faq-diagram-ring" style={{ width: 380, height: 380 }} />
+        <div className="lp-faq-diagram-ring" style={{ width: 240, height: 240 }} />
+        <div className="lp-faq-diagram-core" />
+      </div>
       <div className="lp-container">
         <Reveal>
           <div className="lp-section-header">

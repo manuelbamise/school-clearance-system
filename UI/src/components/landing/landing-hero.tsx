@@ -1,7 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import {
   ArrowRight,
-  Star,
   ShieldCheck,
   Play,
   Upload,
@@ -17,6 +16,7 @@ import {
   User,
 } from 'lucide-react'
 import Reveal from './reveal'
+import LandingLogoMarquee from './landing-marquee'
 
 /* ---------- Mockup: faithful app frame ---------- */
 
@@ -181,7 +181,12 @@ export default function LandingHero() {
   return (
     <section className="lp-hero" id="top">
       <div className="lp-hero-glow" />
-      <div className="lp-container">
+      <div className="lp-hero-shapes">
+        <span className="lp-hero-shape s1" />
+        <span className="lp-hero-shape s2" />
+        <span className="lp-hero-shape s3" />
+      </div>
+      <div className="lp-container lp-hero-container">
         <Reveal>
           <div className="lp-hero-content">
             <span className="lp-badge">
@@ -212,22 +217,14 @@ export default function LandingHero() {
                 Watch Demo
               </a>
             </div>
-
-            <div className="lp-hero-trust">
-              <span className="lp-stars">
-                <Star size={15} fill="currentColor" stroke="none" />
-                <Star size={15} fill="currentColor" stroke="none" />
-                <Star size={15} fill="currentColor" stroke="none" />
-                <Star size={15} fill="currentColor" stroke="none" />
-                <Star size={15} fill="currentColor" stroke="none" />
-              </span>
-              <span style={{ fontWeight: 600, color: '#fff' }}>4.9</span>
-              <span className="lp-caption">Trusted by 50+ universities</span>
-            </div>
           </div>
         </Reveal>
 
-        <Reveal delay={120}>
+        <Reveal delay={100}>
+          <LandingLogoMarquee />
+        </Reveal>
+
+        <Reveal delay={180}>
           <HeroMockup />
         </Reveal>
       </div>
