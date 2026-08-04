@@ -22,6 +22,7 @@ const steps = [
 export default function LandingHowItWorks() {
   return (
     <section className="lp-section lp-how" id="how-it-works">
+      <div className="lp-how-grid" />
       <div className="lp-container">
         <Reveal>
           <div className="lp-section-header">
