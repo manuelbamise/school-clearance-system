@@ -60,7 +60,13 @@ const swaggerSpec = {
           staffId: { type: 'string', nullable: true },
           role: {
             type: 'string',
-            enum: ['student', 'superAdmin', 'academic', 'bursary', 'department'],
+            enum: [
+              'student',
+              'superAdmin',
+              'academic',
+              'bursary',
+              'department',
+            ],
           },
           departmentId: { type: 'string', nullable: true },
           department: {
@@ -92,8 +98,12 @@ const swaggerSpec = {
         type: 'object',
         required: ['email', 'password'],
         properties: {
-          email: { type: 'string', format: 'email', example: 'super@portal.test' },
-          password: { type: 'string', format: 'password', example: 'password123' },
+          email: {
+            type: 'string',
+            format: 'email',
+            example: 'credentials@portal.test',
+          },
+          password: { type: 'string', format: 'password', example: 'password' },
         },
       },
       CreateUserInput: {
@@ -105,7 +115,13 @@ const swaggerSpec = {
           name: { type: 'string' },
           role: {
             type: 'string',
-            enum: ['student', 'superAdmin', 'academic', 'bursary', 'department'],
+            enum: [
+              'student',
+              'superAdmin',
+              'academic',
+              'bursary',
+              'department',
+            ],
           },
           studentId: { type: 'string' },
           staffId: { type: 'string' },
@@ -119,7 +135,13 @@ const swaggerSpec = {
           name: { type: 'string' },
           role: {
             type: 'string',
-            enum: ['student', 'superAdmin', 'academic', 'bursary', 'department'],
+            enum: [
+              'student',
+              'superAdmin',
+              'academic',
+              'bursary',
+              'department',
+            ],
           },
           studentId: { type: 'string' },
           staffId: { type: 'string' },
@@ -131,7 +153,11 @@ const swaggerSpec = {
         properties: {
           id: { type: 'string' },
           userName: { type: 'string', example: 'John Doe' },
-          userEmail: { type: 'string', format: 'email', example: 'john@test.com' },
+          userEmail: {
+            type: 'string',
+            format: 'email',
+            example: 'john@test.com',
+          },
           userDepartment: { type: 'string', example: 'Computer Science' },
           title: { type: 'string', example: 'Missing Fee Receipt' },
           content: { type: 'string' },
@@ -144,7 +170,10 @@ const swaggerSpec = {
         required: ['title', 'content'],
         properties: {
           title: { type: 'string', example: 'Missing Fee Receipt' },
-          content: { type: 'string', example: 'I submitted my fee receipt last week...' },
+          content: {
+            type: 'string',
+            example: 'I submitted my fee receipt last week...',
+          },
         },
       },
       UpdateReportStatus: {
@@ -174,7 +203,11 @@ const swaggerSpec = {
         properties: {
           id: { type: 'string' },
           who: { type: 'string', example: 'Super Admin' },
-          whoEmail: { type: 'string', format: 'email', example: 'admin@test.com' },
+          whoEmail: {
+            type: 'string',
+            format: 'email',
+            example: 'admin@test.com',
+          },
           what: { type: 'string', example: 'Successful login' },
           when: { type: 'string', format: 'date-time' },
           where: { type: 'string', example: '192.168.1.100' },
@@ -200,7 +233,10 @@ const swaggerSpec = {
           action: { type: 'string', example: 'uploaded' },
           target: { type: 'string', example: 'CS 301 Assignment' },
           timestamp: { type: 'string', format: 'date-time' },
-          type: { type: 'string', enum: ['info', 'success', 'warning', 'error'] },
+          type: {
+            type: 'string',
+            enum: ['info', 'success', 'warning', 'error'],
+          },
         },
       },
       Document: {
@@ -313,7 +349,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    message: { type: 'string', example: 'Server is running well' },
+                    message: {
+                      type: 'string',
+                      example: 'Server is running well',
+                    },
                   },
                 },
               },
@@ -327,7 +366,8 @@ const swaggerSpec = {
       post: {
         tags: ['Auth'],
         summary: 'Login',
-        description: 'Authenticates with email and password. Returns user data and JWT token.',
+        description:
+          'Authenticates with email and password. Returns user data and JWT token.',
         requestBody: {
           required: true,
           content: {
@@ -361,7 +401,7 @@ const swaggerSpec = {
       get: {
         tags: ['Auth'],
         summary: 'Get current user',
-        description: 'Returns the authenticated user\'s profile.',
+        description: "Returns the authenticated user's profile.",
         security: [{ bearerAuth: [] }],
         responses: {
           '200': {
@@ -394,12 +434,26 @@ const swaggerSpec = {
       get: {
         tags: ['Users'],
         summary: 'List all users',
-        description: 'Returns a paginated list of users. Requires superAdmin role.',
+        description:
+          'Returns a paginated list of users. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
-          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
-          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by name, email, student ID, or staff ID' },
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 10 },
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Search by name, email, student ID, or staff ID',
+          },
         ],
         responses: {
           '200': {
@@ -410,7 +464,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/User' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/User' },
+                    },
                     meta: { $ref: '#/components/schemas/PaginationMeta' },
                   },
                 },
@@ -463,7 +520,12 @@ const swaggerSpec = {
         description: 'Returns a single user. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         responses: {
           '200': {
@@ -488,10 +550,15 @@ const swaggerSpec = {
       patch: {
         tags: ['Users'],
         summary: 'Update user',
-        description: 'Updates a user\'s details. Requires superAdmin role.',
+        description: "Updates a user's details. Requires superAdmin role.",
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         requestBody: {
           required: true,
@@ -528,7 +595,12 @@ const swaggerSpec = {
         description: 'Permanently deletes a user. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         responses: {
           '200': {
@@ -550,7 +622,8 @@ const swaggerSpec = {
       post: {
         tags: ['Reports'],
         summary: 'Create a report',
-        description: 'Submits a new report. Accessible to all roles except superAdmin.',
+        description:
+          'Submits a new report. Accessible to all roles except superAdmin.',
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -577,19 +650,39 @@ const swaggerSpec = {
           },
           '400': { description: 'Validation error' },
           '401': { description: 'Unauthorized' },
-          '403': { description: 'Forbidden — superAdmin cannot create reports' },
+          '403': {
+            description: 'Forbidden — superAdmin cannot create reports',
+          },
         },
       },
       get: {
         tags: ['Reports'],
         summary: 'List all reports',
-        description: 'Returns a paginated list of reports. Requires superAdmin role.',
+        description:
+          'Returns a paginated list of reports. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
-          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
-          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by title, user name, or email' },
-          { in: 'query', name: 'status', schema: { type: 'string', enum: ['all', 'pending', 'resolved'] } },
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 10 },
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Search by title, user name, or email',
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: { type: 'string', enum: ['all', 'pending', 'resolved'] },
+          },
         ],
         responses: {
           '200': {
@@ -600,7 +693,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/Report' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Report' },
+                    },
                     meta: { $ref: '#/components/schemas/PaginationMeta' },
                   },
                 },
@@ -620,7 +716,12 @@ const swaggerSpec = {
         description: 'Resolves or reopens a report. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         requestBody: {
           required: true,
@@ -657,7 +758,12 @@ const swaggerSpec = {
         description: 'Permanently deletes a report. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         responses: {
           '200': {
@@ -679,7 +785,8 @@ const swaggerSpec = {
       get: {
         tags: ['Departments'],
         summary: 'List all departments',
-        description: 'Returns all departments with user count. Requires superAdmin role.',
+        description:
+          'Returns all departments with user count. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         responses: {
           '200': {
@@ -743,10 +850,16 @@ const swaggerSpec = {
       delete: {
         tags: ['Departments'],
         summary: 'Delete department',
-        description: 'Permanently deletes a department. Requires superAdmin role.',
+        description:
+          'Permanently deletes a department. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         responses: {
           '200': {
@@ -768,11 +881,20 @@ const swaggerSpec = {
       get: {
         tags: ['Activities'],
         summary: 'List recent activities',
-        description: 'Returns a paginated list of recent user activities for the dashboard feed. Any authenticated user can view.',
+        description:
+          'Returns a paginated list of recent user activities for the dashboard feed. Any authenticated user can view.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
-          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 10 },
+          },
         ],
         responses: {
           '200': {
@@ -783,7 +905,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/Activity' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Activity' },
+                    },
                     meta: { $ref: '#/components/schemas/PaginationMeta' },
                   },
                 },
@@ -799,13 +924,34 @@ const swaggerSpec = {
       get: {
         tags: ['Audit Logs'],
         summary: 'List audit logs',
-        description: 'Returns a paginated list of audit logs. Requires superAdmin role. Filterable by category and search.',
+        description:
+          'Returns a paginated list of audit logs. Requires superAdmin role. Filterable by category and search.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
-          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
-          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by action, reason, IP, user name, or email' },
-          { in: 'query', name: 'category', schema: { type: 'string', enum: ['all', 'login', 'permission', 'export', 'user-management'] } },
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 10 },
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Search by action, reason, IP, user name, or email',
+          },
+          {
+            in: 'query',
+            name: 'category',
+            schema: {
+              type: 'string',
+              enum: ['all', 'login', 'permission', 'export', 'user-management'],
+            },
+          },
         ],
         responses: {
           '200': {
@@ -816,7 +962,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/AuditLog' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/AuditLog' },
+                    },
                     meta: { $ref: '#/components/schemas/PaginationMeta' },
                   },
                 },
@@ -830,7 +979,8 @@ const swaggerSpec = {
       delete: {
         tags: ['Audit Logs'],
         summary: 'Clear all audit logs',
-        description: 'Permanently deletes all audit logs. Requires superAdmin role.',
+        description:
+          'Permanently deletes all audit logs. Requires superAdmin role.',
         security: [{ bearerAuth: [] }],
         responses: {
           '200': {
@@ -851,7 +1001,8 @@ const swaggerSpec = {
       post: {
         tags: ['Documents'],
         summary: 'Upload a document',
-        description: 'Student uploads a document and sends it to the chosen unit (academic, bursary, or their department). Multipart form-data with a "file" field. The student is automatically added to the clearance list on their first upload.',
+        description:
+          'Student uploads a document and sends it to the chosen unit (academic, bursary, or their department). Multipart form-data with a "file" field. The student is automatically added to the clearance list on their first upload.',
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -864,8 +1015,15 @@ const swaggerSpec = {
                   name: { type: 'string', description: 'Document name' },
                   level: { type: 'string', description: 'e.g. 400L' },
                   session: { type: 'string', description: 'e.g. 2024/2025' },
-                  unit: { type: 'string', enum: ['academic', 'bursary', 'department'] },
-                  file: { type: 'string', format: 'binary', description: 'PDF or image file (max 5MB)' },
+                  unit: {
+                    type: 'string',
+                    enum: ['academic', 'bursary', 'department'],
+                  },
+                  file: {
+                    type: 'string',
+                    format: 'binary',
+                    description: 'PDF or image file (max 5MB)',
+                  },
                 },
               },
             },
@@ -894,12 +1052,28 @@ const swaggerSpec = {
       get: {
         tags: ['Documents'],
         summary: 'List my documents',
-        description: 'Returns the authenticated student\'s uploaded documents. Requires student role.',
+        description:
+          "Returns the authenticated student's uploaded documents. Requires student role.",
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
-          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
-          { in: 'query', name: 'status', schema: { type: 'string', enum: ['all', 'pending', 'approved', 'rejected'] } },
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 10 },
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: {
+              type: 'string',
+              enum: ['all', 'pending', 'approved', 'rejected'],
+            },
+          },
         ],
         responses: {
           '200': {
@@ -910,7 +1084,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/Document' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Document' },
+                    },
                     meta: { $ref: '#/components/schemas/PaginationMeta' },
                   },
                 },
@@ -927,13 +1104,34 @@ const swaggerSpec = {
       get: {
         tags: ['Documents'],
         summary: 'List received documents',
-        description: 'Returns documents routed to the authenticated unit staff. Academic and bursary staff receive all documents for their unit; department staff receive documents for their own department. Requires academic, bursary, or department role.',
+        description:
+          'Returns documents routed to the authenticated unit staff. Academic and bursary staff receive all documents for their unit; department staff receive documents for their own department. Requires academic, bursary, or department role.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
-          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
-          { in: 'query', name: 'status', schema: { type: 'string', enum: ['all', 'pending', 'approved', 'rejected'] } },
-          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by document name or student' },
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 10 },
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: {
+              type: 'string',
+              enum: ['all', 'pending', 'approved', 'rejected'],
+            },
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Search by document name or student',
+          },
         ],
         responses: {
           '200': {
@@ -944,7 +1142,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/Document' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Document' },
+                    },
                     meta: { $ref: '#/components/schemas/PaginationMeta' },
                   },
                 },
@@ -961,10 +1162,16 @@ const swaggerSpec = {
       patch: {
         tags: ['Documents'],
         summary: 'Approve or reject a document',
-        description: 'Approves or rejects a document sent to the authenticated unit staff. A rejection reason is required when rejecting.',
+        description:
+          'Approves or rejects a document sent to the authenticated unit staff. A rejection reason is required when rejecting.',
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'id', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         requestBody: {
           required: true,
@@ -975,7 +1182,10 @@ const swaggerSpec = {
                 required: ['status'],
                 properties: {
                   status: { type: 'string', enum: ['approved', 'rejected'] },
-                  rejectionReason: { type: 'string', description: 'Required when rejecting' },
+                  rejectionReason: {
+                    type: 'string',
+                    description: 'Required when rejecting',
+                  },
                 },
               },
             },
@@ -1008,7 +1218,8 @@ const swaggerSpec = {
       get: {
         tags: ['Clearance'],
         summary: 'Get my clearance status',
-        description: 'Returns the authenticated student\'s clearance steps across the academic, bursary, and department units. Requires student role.',
+        description:
+          "Returns the authenticated student's clearance steps across the academic, bursary, and department units. Requires student role.",
         security: [{ bearerAuth: [] }],
         responses: {
           '200': {
@@ -1023,7 +1234,10 @@ const swaggerSpec = {
                       type: 'object',
                       properties: {
                         clearance: { type: 'object', nullable: true },
-                        steps: { type: 'array', items: { $ref: '#/components/schemas/ClearanceStep' } },
+                        steps: {
+                          type: 'array',
+                          items: { $ref: '#/components/schemas/ClearanceStep' },
+                        },
                       },
                     },
                   },
@@ -1041,13 +1255,31 @@ const swaggerSpec = {
       get: {
         tags: ['Clearance'],
         summary: 'List clearance requests',
-        description: 'Returns the clearance list for the authenticated unit staff\'s unit. Academic and bursary staff see all students; department staff see students in their own department. Requires academic, bursary, or department role.',
+        description:
+          "Returns the clearance list for the authenticated unit staff's unit. Academic and bursary staff see all students; department staff see students in their own department. Requires academic, bursary, or department role.",
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
-          { in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } },
-          { in: 'query', name: 'status', schema: { type: 'string', enum: ['all', 'pending', 'cleared'] } },
-          { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by student name or ID' },
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 10 },
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: { type: 'string', enum: ['all', 'pending', 'cleared'] },
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Search by student name or ID',
+          },
         ],
         responses: {
           '200': {
@@ -1058,7 +1290,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/ClearanceListItem' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/ClearanceListItem' },
+                    },
                     meta: { $ref: '#/components/schemas/PaginationMeta' },
                   },
                 },
@@ -1075,10 +1310,16 @@ const swaggerSpec = {
       patch: {
         tags: ['Clearance'],
         summary: 'Clear a student',
-        description: 'Marks the student as cleared for the authenticated unit staff\'s unit. Department staff can only clear students in their own department. Requires academic, bursary, or department role.',
+        description:
+          "Marks the student as cleared for the authenticated unit staff's unit. Department staff can only clear students in their own department. Requires academic, bursary, or department role.",
         security: [{ bearerAuth: [] }],
         parameters: [
-          { in: 'path', name: 'studentId', required: true, schema: { type: 'string' } },
+          {
+            in: 'path',
+            name: 'studentId',
+            required: true,
+            schema: { type: 'string' },
+          },
         ],
         responses: {
           '200': {
@@ -1089,7 +1330,9 @@ const swaggerSpec = {
               },
             },
           },
-          '400': { description: 'Student not on clearance list or wrong department' },
+          '400': {
+            description: 'Student not on clearance list or wrong department',
+          },
           '401': { description: 'Unauthorized' },
           '403': { description: 'Forbidden' },
           '404': { description: 'Clearance not found' },
@@ -1101,7 +1344,8 @@ const swaggerSpec = {
       get: {
         tags: ['Metrics'],
         summary: 'Get dashboard metrics',
-        description: 'Returns the authenticated user\'s dashboard metric cards computed for the current month, with trend compared to the previous month. Metrics differ per role. Computed live and stored as snapshots.',
+        description:
+          "Returns the authenticated user's dashboard metric cards computed for the current month, with trend compared to the previous month. Metrics differ per role. Computed live and stored as snapshots.",
         security: [{ bearerAuth: [] }],
         responses: {
           '200': {
@@ -1112,7 +1356,10 @@ const swaggerSpec = {
                   type: 'object',
                   properties: {
                     status: { type: 'string', example: 'success' },
-                    data: { type: 'array', items: { $ref: '#/components/schemas/MetricCard' } },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/MetricCard' },
+                    },
                   },
                 },
               },

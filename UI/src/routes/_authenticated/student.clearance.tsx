@@ -171,7 +171,7 @@ function StudentClearancePage() {
                               width: isStepActive ? '100%' : '0%',
                               backgroundColor: isComplete
                                 ? 'var(--color-success, #10b981)'
-                                : 'var(--color-primary, #7c3aed)',
+                                : 'var(--color-primary, #2563eb)',
                             }}
                             transition={{ duration: 0.6, ease: 'easeOut' }}
                             className="absolute inset-y-0 left-0 rounded-full"

@@ -45,25 +45,30 @@ const socials = [
   { label: 'GitHub', icon: <GitHubIcon /> },
 ]
 
+const logoIconCls =
+  'flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-lp-blue to-lp-cyan text-white shadow-[0_4px_14px_rgba(37,99,235,0.35)]'
+
 export default function LandingFooter() {
   return (
-    <footer className="lp-footer">
-      <div className="lp-container">
-        <div className="lp-footer-grid">
-          <div className="lp-footer-brand">
-            <a href="#top" className="lp-logo">
-              <span className="lp-logo-icon">
+    <footer className="border-t border-lp-line bg-lp-deep pt-16">
+      <div className="mx-auto max-w-[1200px] px-10 max-[809px]:px-5">
+        <div className="grid grid-cols-2 gap-12 md:grid-cols-3 xl:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          <div>
+            <a href="#top" className="flex items-center gap-2.5 font-display text-xl font-bold tracking-[-0.02em] text-white no-underline">
+              <span className={logoIconCls}>
                 <GraduationCap size={18} strokeWidth={2.5} />
               </span>
               ClearPath
             </a>
-            <p className="lp-caption">Streamlining student clearance worldwide.</p>
-            <div className="lp-footer-socials">
+            <p className="mt-4 max-w-[260px] text-sm font-normal leading-[1.4] text-lp-muted">
+              Streamlining student clearance worldwide.
+            </p>
+            <div className="mt-5 flex gap-3">
               {socials.map((s) => (
                 <a
                   key={s.label}
                   href="#top"
-                  className="lp-footer-social"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-lp-line text-lp-muted transition-[color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-white hover:text-white"
                   aria-label={s.label}
                   onClick={(e) => e.preventDefault()}
                 >
@@ -74,13 +79,17 @@ export default function LandingFooter() {
           </div>
 
           {columns.map((col) => (
-            <div key={col.title} className="lp-footer-col">
-              <h4 className="lp-h4" style={{ fontSize: 14, fontWeight: 600 }}>
+            <div key={col.title}>
+              <h4 className="mb-5 text-sm font-semibold tracking-[-0.02em] text-white">
                 {col.title}
               </h4>
-              <div className="lp-footer-links">
+              <div className="flex flex-col gap-3">
                 {col.links.map((link) => (
-                  <a key={link} href="#top" className="lp-footer-link">
+                  <a
+                    key={link}
+                    href="#top"
+                    className="relative w-fit pb-px text-sm font-normal text-lp-muted no-underline transition-colors after:absolute after:left-0 after:-bottom-px after:h-px after:w-0 after:bg-white after:transition-[width] after:duration-300 hover:text-white hover:after:w-full"
+                  >
                     {link}
                   </a>
                 ))}
@@ -89,9 +98,9 @@ export default function LandingFooter() {
           ))}
         </div>
 
-        <div className="lp-footer-bottom">
-          <span className="lp-caption">© 2024 ClearPath. All rights reserved.</span>
-          <span className="lp-caption">
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-lp-line py-6">
+          <span className="text-sm font-normal leading-[1.4] text-lp-muted">© 2024 ClearPath. All rights reserved.</span>
+          <span className="text-sm font-normal leading-[1.4] text-lp-muted">
             Built with care for students everywhere.
           </span>
         </div>

@@ -9,14 +9,16 @@ const stats = [
 
 export default function LandingStats() {
   return (
-    <section className="lp-stats">
-      <div className="lp-container">
-        <div className="lp-stats-grid">
+    <section className="border-y border-lp-line bg-lp-deep">
+      <div className="mx-auto max-w-[1200px] px-10 max-[809px]:px-5">
+        <div className="grid grid-cols-2 gap-6 py-12 md:grid-cols-4">
           {stats.map((s, i) => (
             <Reveal key={s.label} delay={i * 100}>
-              <div className="lp-stat">
-                <div className="lp-stat-value">{s.value}</div>
-                <div className="lp-stat-label">{s.label}</div>
+              <div className="text-center">
+                <div className="mb-1.5 font-display text-[clamp(36px,4vw,48px)] font-medium tracking-[-0.02em] text-white">
+                  {s.value}
+                </div>
+                <div className="text-sm font-normal text-lp-muted">{s.label}</div>
               </div>
             </Reveal>
           ))}

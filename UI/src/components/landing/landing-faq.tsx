@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import Reveal from './reveal'
+import { SectionHeader } from './landing-ui'
 
 interface FaqItem {
   question: string
@@ -47,43 +48,54 @@ export default function LandingFaq() {
     setOpenIndex((current) => (current === idx ? null : idx))
 
   return (
-    <section className="lp-section lp-faq" id="faq">
-      <div className="lp-faq-diagram">
-        <div className="lp-faq-diagram-ring" style={{ width: 520, height: 520 }} />
-        <div className="lp-faq-diagram-ring" style={{ width: 380, height: 380 }} />
-        <div className="lp-faq-diagram-ring" style={{ width: 240, height: 240 }} />
-        <div className="lp-faq-diagram-core" />
+    <section className="relative overflow-hidden bg-lp-deep py-20 max-[809px]:py-16" id="faq">
+      <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
+        <div className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]" style={{ width: 520, height: 520 }} />
+        <div className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]" style={{ width: 380, height: 380 }} />
+        <div className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]" style={{ width: 240, height: 240 }} />
+        <div className="absolute h-[120px] w-[120px] rounded-full [background:radial-gradient(circle,rgba(37,99,235,0.14),rgba(230,184,102,0.06)_55%,transparent_72%)] shadow-[0_0_80px_rgba(37,99,235,0.12)]" />
       </div>
-      <div className="lp-container">
-        <Reveal>
-          <div className="lp-section-header">
-            <h2>Frequently Asked Questions</h2>
-            <p className="lp-section-subtitle">
-              Everything you need to know about ClearPath.
-            </p>
-          </div>
-        </Reveal>
+      <div className="relative z-10 mx-auto max-w-[1200px] px-10 max-[809px]:px-5">
+        <SectionHeader
+          title="Frequently Asked Questions"
+          subtitle="Everything you need to know about ClearPath."
+        />
 
-        <div className="lp-faq-list">
+        <div className="mx-auto max-w-[768px]">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i
             return (
               <Reveal key={faq.question} delay={i < 4 ? i * 60 : 0}>
-                <div className={`lp-faq-item ${isOpen ? 'open' : ''}`}>
+                <div
+                  className={`mb-3.5 rounded-[18px] border bg-white/[0.015] px-[22px] transition-[border-color,box-shadow,background] duration-300 last:mb-0 ${
+                    isOpen
+                      ? 'border-lp-blue/40 bg-gradient-to-b from-lp-blue/[0.05] to-lp-gold/[0.03] shadow-[0_0_0_1px_rgba(37,99,235,0.14),0_0_40px_rgba(37,99,235,0.14),0_0_90px_rgba(230,184,102,0.06)]'
+                      : 'border-lp-line'
+                  }`}
+                >
                   <button
                     type="button"
-                    className="lp-faq-question"
+                    className="flex w-full cursor-pointer items-center justify-between gap-4 border-none bg-transparent py-5 text-left text-white"
                     aria-expanded={isOpen}
                     onClick={() => toggle(i)}
                   >
-                    <h4 className="lp-h4" style={{ fontSize: 18 }}>
-                      {faq.question}
-                    </h4>
-                    <ChevronDown className="lp-faq-chevron" size={20} />
+                    <h4 className="text-lg font-normal leading-[1.5] text-white">{faq.question}</h4>
+                    <ChevronDown
+                      size={20}
+                      className={`flex-shrink-0 text-lp-muted transition-[transform,color] duration-300 ${
+                        isOpen ? 'rotate-180 text-lp-gold' : ''
+                      }`}
+                    />
                   </button>
-                  <div className="lp-faq-answer-wrap">
-                    <div className="lp-faq-answer">
-                      <p className="lp-body">{faq.answer}</p>
+                  <div
+                    className={`grid transition-[grid-template-rows] duration-300 ${
+                      isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="m-0 p-0 pb-5 text-[clamp(14px,1.2vw,16px)] font-normal leading-[1.5] tracking-[-0.03em] text-lp-muted">
+                        {faq.answer}
+                      </p>
                     </div>
                   </div>
                 </div>
