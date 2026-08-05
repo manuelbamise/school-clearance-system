@@ -66,7 +66,7 @@ export default function LandingNav() {
 
           <button
             type="button"
-            className={`${btnPrimary} hidden px-5 py-2.5 text-sm min-[810px]:inline-flex`}
+            className={`${btnPrimary} px-5 py-2.5 text-sm max-[809px]:hidden`}
             onClick={goToLogin}
           >
             Get Started

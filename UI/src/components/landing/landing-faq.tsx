@@ -67,7 +67,9 @@ export default function LandingFaq() {
             return (
               <Reveal key={faq.question} delay={i < 4 ? i * 60 : 0}>
                 <div
-                  className={`mb-3.5 rounded-[18px] border bg-white/[0.015] px-[22px] transition-[border-color,box-shadow,background] duration-300 last:mb-0 ${
+                  className={`mb-3.5 rounded-[18px] border bg-white/[0.015] px-[22px] transition-[border-color,box-shadow,background] duration-300 ${
+                    i === faqs.length - 1 ? 'mb-0' : ''
+                  } ${
                     isOpen
                       ? 'border-lp-blue/40 bg-gradient-to-b from-lp-blue/[0.05] to-lp-gold/[0.03] shadow-[0_0_0_1px_rgba(37,99,235,0.14),0_0_40px_rgba(37,99,235,0.14),0_0_90px_rgba(230,184,102,0.06)]'
                       : 'border-lp-line'

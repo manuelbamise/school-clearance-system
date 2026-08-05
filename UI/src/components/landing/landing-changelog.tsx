@@ -82,7 +82,11 @@ export default function LandingChangelog() {
         <div className="mx-auto max-w-[800px]">
           {changes.map((c, i) => (
             <Reveal key={`${c.date}-${i}`} delay={i < 4 ? i * 60 : 0}>
-              <div className="grid grid-cols-[128px_1fr] gap-6 border-b border-lp-line py-5 first:pt-0 last:border-b-0 max-[809px]:grid-cols-1 max-[809px]:gap-3">
+              <div
+                className={`grid grid-cols-[128px_1fr] gap-6 border-b border-lp-line py-5 max-[809px]:grid-cols-1 max-[809px]:gap-3 ${
+                  i === 0 ? 'pt-0' : ''
+                } ${i === changes.length - 1 ? 'border-b-0' : ''}`}
+              >
                 <span className="h-fit whitespace-nowrap rounded-lg border border-lp-line bg-lp-glass px-3 py-1 text-sm font-normal text-lp-muted">
                   {c.date}
                 </span>
