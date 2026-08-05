@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
-import Reveal from './reveal'
-import { SectionHeader } from './landing-ui'
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import Reveal from './reveal';
+import { SectionHeader } from './landing-ui';
 
 interface FaqItem {
-  question: string
-  answer: string
+  question: string;
+  answer: string;
 }
 
 const faqs: FaqItem[] = [
@@ -39,20 +39,32 @@ const faqs: FaqItem[] = [
     answer:
       'ClearPath is fully responsive and works on any device. We also have native iOS and Android apps for document scanning and quick status checks.',
   },
-]
+];
 
 export default function LandingFaq() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggle = (idx: number) =>
-    setOpenIndex((current) => (current === idx ? null : idx))
+    setOpenIndex((current) => (current === idx ? null : idx));
 
   return (
-    <section className="relative overflow-hidden bg-lp-deep py-20 max-[809px]:py-16" id="faq">
+    <section
+      className="relative overflow-hidden bg-lp-deep py-20 max-[809px]:py-16"
+      id="faq"
+    >
       <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
-        <div className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]" style={{ width: 520, height: 520 }} />
-        <div className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]" style={{ width: 380, height: 380 }} />
-        <div className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]" style={{ width: 240, height: 240 }} />
+        <div
+          className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]"
+          style={{ width: 520, height: 520 }}
+        />
+        <div
+          className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]"
+          style={{ width: 380, height: 380 }}
+        />
+        <div
+          className="absolute rounded-full border border-lp-blue/15 shadow-[0_0_60px_rgba(37,99,235,0.06)]"
+          style={{ width: 240, height: 240 }}
+        />
         <div className="absolute h-[120px] w-[120px] rounded-full [background:radial-gradient(circle,rgba(37,99,235,0.14),rgba(230,184,102,0.06)_55%,transparent_72%)] shadow-[0_0_80px_rgba(37,99,235,0.12)]" />
       </div>
       <div className="relative z-10 mx-auto max-w-[1200px] px-10 max-[809px]:px-5">
@@ -63,9 +75,9 @@ export default function LandingFaq() {
 
         <div className="mx-auto max-w-[768px]">
           {faqs.map((faq, i) => {
-            const isOpen = openIndex === i
+            const isOpen = openIndex === i;
             return (
-              <Reveal key={faq.question} delay={i < 4 ? i * 60 : 0}>
+              <Reveal key={faq.question} delay={i < 4 ? i * 0.4 : 0}>
                 <div
                   className={`mb-3.5 rounded-[18px] border bg-white/[0.015] px-[22px] transition-[border-color,box-shadow,background] duration-300 ${
                     i === faqs.length - 1 ? 'mb-0' : ''
@@ -81,7 +93,9 @@ export default function LandingFaq() {
                     aria-expanded={isOpen}
                     onClick={() => toggle(i)}
                   >
-                    <h4 className="text-lg font-normal leading-[1.5] text-white">{faq.question}</h4>
+                    <h4 className="text-lg font-normal leading-[1.5] text-white">
+                      {faq.question}
+                    </h4>
                     <ChevronDown
                       size={20}
                       className={`flex-shrink-0 text-lp-muted transition-[transform,color] duration-300 ${
@@ -102,10 +116,10 @@ export default function LandingFaq() {
                   </div>
                 </div>
               </Reveal>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -25,14 +25,26 @@ html {
     linear-gradient(rgba(125, 164, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(125, 164, 255, 0.05) 1px, transparent 1px);
   background-size: 52px 52px;
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 75%);
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 70% at 50% 40%,
+    #000 30%,
+    transparent 75%
+  );
+  mask-image: radial-gradient(
+    ellipse 80% 70% at 50% 40%,
+    #000 30%,
+    transparent 75%
+  );
 }
 .lp-how-grid::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 60% 50% at 50% 35%, rgba(37, 99, 235, 0.08), transparent 70%);
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 35%,
+    rgba(37, 99, 235, 0.08),
+    transparent 70%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -47,5 +59,6 @@ html {
   }
   .landing .lp-shape {
     margin-top: 0;
+    /*transform: translateY(0);*/
   }
 }
