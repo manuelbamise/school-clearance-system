@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -61,13 +61,16 @@ export default function LoginForm() {
 
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="you@portal.test"
-          {...register('email', { required: 'Email is required' })}
-          className={errors.email ? 'border-destructive' : ''}
-        />
+        <div className="relative">
+          <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@portal.test"
+            {...register('email', { required: 'Email is required' })}
+            className={errors.email ? 'h-11 rounded-xl border-destructive pl-10' : 'h-11 rounded-xl pl-10'}
+          />
+        </div>
         {errors.email && (
           <p className="text-xs text-destructive">{errors.email.message}</p>
         )}
@@ -84,12 +87,17 @@ export default function LoginForm() {
           </button>
         </div>
         <div className="relative">
+          <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter your password"
             {...register('password', { required: 'Password is required' })}
-            className={errors.password ? 'border-destructive pr-10' : 'pr-10'}
+            className={
+              errors.password
+                ? 'h-11 rounded-xl border-destructive pl-10 pr-10'
+                : 'h-11 rounded-xl pl-10 pr-10'
+            }
           />
           <button
             type="button"
