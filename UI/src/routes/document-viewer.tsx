@@ -1,5 +1,5 @@
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { GraduationCap, FileSearch, Loader2, ExternalLink } from 'lucide-react'
+import { GraduationCap, FileSearch, Loader2, ExternalLink, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAsync } from '@/hooks/use-async'
 import { getDocument } from '@/lib/api/documents.api'
@@ -22,6 +22,14 @@ function DocumentViewerPage() {
   const fileName = doc.data?.name || fallbackName(search.name)
   const studentName = doc.data ? doc.data.student.name : search.student || ''
   const src = doc.data ? assetUrl(doc.data.fileUrl) : ''
+
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      window.close()
+    }
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-6">
@@ -75,15 +83,25 @@ function DocumentViewerPage() {
                 <span className="truncate text-sm font-semibold text-white">{fileName}</span>
                 {studentName && <span className="truncate text-xs text-white/50">{studentName}</span>}
               </div>
-              <a
-                href={src}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/20 bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/10"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Open in new tab
-              </a>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/10"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Close
+                </button>
+                <a
+                  href={src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/20 bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/10"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Open in new tab
+                </a>
+              </div>
             </div>
             {/* Document body */}
             <div className="aspect-[4/3] w-full bg-neutral-900">
