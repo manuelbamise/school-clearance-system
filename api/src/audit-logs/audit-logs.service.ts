@@ -43,6 +43,31 @@ export const getAll = async (params: {
   };
 };
 
-export const clearAll = async () => {
-  return prisma.auditLog.deleteMany();
+export const clearAll = async (
+  actor: { id: string; name: string },
+  ipAddress?: string,
+) => {
+  return prisma.$transaction(async (tx) => {
+    const { count } = await tx.auditLog.deleteMany();
+
+    await tx.auditLog.create({
+      data: {
+        userId: actor.id,
+        action: 'Cleared audit logs',
+        reason: `${actor.name} cleared ${count} audit log${count === 1 ? '' : 's'}`,
+        category: 'user-management',
+        status: 'success',
+        ipAddress: ipAddress ?? null,
+      },
+    });
+
+    await tx.activity.create({
+      data: {
+        actorId: actor.id,
+        action: 'cleared audit logs',
+        target: `${count} audit log${count === 1 ? '' : 's'}`,
+        type: 'warning',
+      },
+    });
+  });
 };

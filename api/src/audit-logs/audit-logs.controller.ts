@@ -27,9 +27,10 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const clearAll = async (_req: Request, res: Response, next: NextFunction) => {
+export const clearAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await auditLogsService.clearAll();
+    const user = req.user as { id: string; name: string };
+    await auditLogsService.clearAll({ id: user.id, name: user.name }, req.ip);
     res.json({ status: 'success', message: 'All audit logs cleared' });
   } catch (err) {
     next(err);
