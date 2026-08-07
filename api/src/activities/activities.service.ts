@@ -45,3 +45,7 @@ export const getAll = async (
     meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 };
+
+export const clearAll = async () => {
+  return prisma.activity.deleteMany();
+};

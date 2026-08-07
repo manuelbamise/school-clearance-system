@@ -26,3 +26,12 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
     next(err);
   }
 };
+
+export const clearAll = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    await activitiesService.clearAll();
+    res.json({ status: 'success', message: 'All recent activities cleared' });
+  } catch (err) {
+    next(err);
+  }
+};

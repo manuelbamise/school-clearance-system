@@ -918,6 +918,31 @@ const swaggerSpec = {
           '401': { description: 'Unauthorized' },
         },
       },
+      delete: {
+        tags: ['Activities'],
+        summary: 'Clear all recent activities',
+        description:
+          'Permanently deletes all activity feed entries. Requires superAdmin role.',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': {
+            description: 'All recent activities cleared',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'All recent activities cleared' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden — not superAdmin' },
+        },
+      },
     },
 
     '/audit-logs': {
