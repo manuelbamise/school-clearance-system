@@ -68,7 +68,11 @@ export default function LoginForm() {
             type="email"
             placeholder="you@portal.test"
             {...register('email', { required: 'Email is required' })}
-            className={errors.email ? 'h-11 rounded-xl border-destructive pl-10' : 'h-11 rounded-xl pl-10'}
+            className={
+              errors.email
+                ? 'h-11 rounded-xl border-destructive pl-10'
+                : 'h-11 rounded-xl pl-10 focus:bg-white'
+            }
           />
         </div>
         {errors.email && (
@@ -96,7 +100,7 @@ export default function LoginForm() {
             className={
               errors.password
                 ? 'h-11 rounded-xl border-destructive pl-10 pr-10'
-                : 'h-11 rounded-xl pl-10 pr-10'
+                : 'h-11 rounded-xl pl-10 pr-10 focus:bg-white'
             }
           />
           <button
