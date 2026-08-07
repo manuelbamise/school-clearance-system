@@ -1,15 +1,27 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Trash2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states';
 import { useAsync } from '@/hooks/use-async';
-import { getAuditLogs } from '@/lib/api/audit-logs.api';
+import { getAuditLogs, clearAuditLogs } from '@/lib/api/audit-logs.api';
 import { mapAuditLog } from '@/lib/api/mappers';
+import { errorMessage } from '@/lib/api/client';
 import type { AuditLog } from '@/types';
 
 export const Route = createFileRoute('/_authenticated/superadmin/audit')({
@@ -23,6 +35,12 @@ const categoryOptions = [
   { value: 'export', label: 'Data Exports' },
   { value: 'user-management', label: 'User Management' },
 ] as const;
+
+const CLEAR_REQUIREMENTS = [
+  'I understand that all audit logs will be permanently cleared.',
+  'I understand that this action is irreversible and cannot be undone.',
+  'I confirm this should not be run while active clearance is in progress.',
+];
 
 const categoryBadge = (cat: AuditLog['category']) => {
   const map: Record<string, { variant: 'default' | 'warning' | 'destructive'; label: string }> = {
@@ -46,6 +64,11 @@ function SuperadminAuditPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [checked, setChecked] = useState<boolean[]>(CLEAR_REQUIREMENTS.map(() => false));
+  const [clearing, setClearing] = useState(false);
+  const [clearError, setClearError] = useState<string | null>(null);
+
   const filteredLogs = useMemo(
     () =>
       logs
@@ -64,6 +87,29 @@ function SuperadminAuditPage() {
     (safePage - 1) * ITEMS_PER_PAGE,
     safePage * ITEMS_PER_PAGE,
   );
+
+  const allChecked = checked.every(Boolean);
+
+  const openDialog = () => {
+    setChecked(CLEAR_REQUIREMENTS.map(() => false));
+    setClearError(null);
+    setDialogOpen(true);
+  };
+
+  const handleClear = async () => {
+    setClearing(true);
+    setClearError(null);
+    try {
+      await clearAuditLogs();
+      await logsReq.refetch();
+      setChecked(CLEAR_REQUIREMENTS.map(() => false));
+      setDialogOpen(false);
+    } catch (err) {
+      setClearError(errorMessage(err));
+    } finally {
+      setClearing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -88,17 +134,23 @@ function SuperadminAuditPage() {
           </CardHeader>
           <CardContent className="space-y-4 p-5">
             {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Search by user, action, IP, or reason..."
-                className="pl-9"
-              />
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Search by user, action, IP, or reason..."
+                  className="pl-9"
+                />
+              </div>
+              <Button variant="destructive" onClick={openDialog}>
+                <Trash2 className="h-4 w-4" />
+                Clear Logs
+              </Button>
             </div>
 
             {/* Category Filters */}
@@ -243,6 +295,66 @@ function SuperadminAuditPage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Clear All Audit Logs Confirmation Modal */}
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (!open) setDialogOpen(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear All Audit Logs</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to clear all audit logs? Confirm the following
+              before continuing.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {CLEAR_REQUIREMENTS.map((req, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 rounded-lg border border-border p-3"
+              >
+                <Checkbox
+                  id={`clear-req-${i}`}
+                  checked={checked[i]}
+                  disabled={clearing}
+                  onCheckedChange={(v) =>
+                    setChecked((prev) =>
+                      prev.map((c, idx) => (idx === i ? Boolean(v) : c)),
+                    )
+                  }
+                />
+                <Label htmlFor={`clear-req-${i}`} className="text-sm text-muted-foreground">
+                  {req}
+                </Label>
+              </div>
+            ))}
+          </div>
+          {clearError && <p className="text-xs text-destructive">{clearError}</p>}
+          <div className="flex items-center justify-between pt-2">
+            <DialogClose asChild>
+              <Button variant="outline" disabled={clearing}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={handleClear}
+              disabled={!allChecked || clearing}
+            >
+              {clearing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Clear All Logs
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
