@@ -42,3 +42,8 @@ export const reviewDocument = async (
   const res = await apiClient.patch(`/documents/${id}/review`, body)
   return unwrap<ApiDocument>(res.data).data
 }
+
+export const deleteDocument = async (id: string): Promise<ApiDocument> => {
+  const res = await apiClient.delete(`/documents/${id}`)
+  return unwrap<ApiDocument>(res.data).data
+}

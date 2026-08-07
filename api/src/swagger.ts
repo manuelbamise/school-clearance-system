@@ -1214,6 +1214,44 @@ const swaggerSpec = {
       },
     },
 
+    '/documents/{id}': {
+      delete: {
+        tags: ['Documents'],
+        summary: 'Delete a reviewed document',
+        description:
+          'Deletes a document that has already been approved or rejected. Only the unit staff member the document was sent to can delete it. The uploaded file is removed from storage as well. Requires academic, bursary, or department role.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Document deleted',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/Document' },
+                  },
+                },
+              },
+            },
+          },
+          '400': { description: 'Document is still pending review' },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden — not the recipient' },
+          '404': { description: 'Document not found' },
+        },
+      },
+    },
+
     '/clearance/me': {
       get: {
         tags: ['Clearance'],

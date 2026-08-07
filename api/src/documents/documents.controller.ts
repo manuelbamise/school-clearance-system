@@ -143,3 +143,21 @@ export const review = async (
     next(err);
   }
 };
+
+export const remove = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = (req.user as { id: string }).id;
+    const document = await documentsService.remove(
+      req.params.id as string,
+      userId,
+      req.ip,
+    );
+    res.json({ status: 'success', data: sanitize(document) });
+  } catch (err) {
+    next(err);
+  }
+};

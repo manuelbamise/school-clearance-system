@@ -25,5 +25,10 @@ documentsRouter.patch(
   authorize('academic', 'bursary', 'department'),
   documentsController.review,
 );
+documentsRouter.delete(
+  '/:id',
+  authorize('academic', 'bursary', 'department'),
+  documentsController.remove,
+);
 
 export default documentsRouter;

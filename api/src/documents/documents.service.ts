@@ -1,5 +1,8 @@
+import fs from 'fs';
+import path from 'path';
 import prisma from '../lib/prisma.js';
 import { AppError } from '../lib/AppError.js';
+import { uploadsDirPath } from '../middleware/upload.middleware.js';
 import * as activitiesService from '../activities/activities.service.js';
 import type { CreateDocumentInput, ReviewDocumentInput } from './documents.validation.js';
 
@@ -224,6 +227,54 @@ export const review = async (
       data.status === 'approved' ? 'approved document' : 'rejected document',
       document.name,
       data.status === 'approved' ? 'success' : 'warning',
+      document.unit,
+    );
+    return document;
+  });
+};
+
+export const remove = async (
+  id: string,
+  userId: string,
+  ipAddress?: string,
+) => {
+  return prisma.$transaction(async (tx) => {
+    const document = await tx.document.findUnique({
+      where: { id },
+      include: { recipient: true, student: true },
+    });
+    if (!document) throw new AppError('Document not found', 404);
+    if (document.recipientId !== userId) {
+      throw new AppError('You can only delete documents sent to you', 403);
+    }
+    if (document.status !== 'approved' && document.status !== 'rejected') {
+      throw new AppError('Only reviewed documents can be deleted', 400);
+    }
+
+    await tx.document.delete({ where: { id } });
+
+    await tx.auditLog.create({
+      data: {
+        userId,
+        action: `Deleted document: ${document.name}`,
+        reason: `${document.recipient.role} unit removed the document`,
+        category: 'user-management',
+        status: 'success',
+        ipAddress: ipAddress ?? null,
+      },
+    });
+
+    return document;
+  }).then(async (document) => {
+    if (document.filePath) {
+      const filePath = path.join(uploadsDirPath, path.basename(document.filePath));
+      await fs.promises.unlink(filePath).catch(() => {});
+    }
+    await activitiesService.log(
+      userId,
+      'deleted document',
+      document.name,
+      'warning',
       document.unit,
     );
     return document;

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Search, ChevronLeft, ChevronRight, Eye, Check, X, Loader2 } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, Eye, Check, X, Trash2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog'
 import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states'
 import { useAsync } from '@/hooks/use-async'
-import { getInbox, reviewDocument } from '@/lib/api/documents.api'
+import { getInbox, reviewDocument, deleteDocument } from '@/lib/api/documents.api'
 import { mapSubmittedDocument } from '@/lib/api/mappers'
 import { errorMessage } from '@/lib/api/client'
 import type { SubmittedDocument } from '@/types'
@@ -50,6 +50,7 @@ export default function UnitDocumentsPage({ unit }: { unit: string }) {
 
   const [approveDoc, setApproveDoc] = useState<SubmittedDocument | null>(null)
   const [rejectDoc, setRejectDoc] = useState<SubmittedDocument | null>(null)
+  const [deleteDoc, setDeleteDoc] = useState<SubmittedDocument | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [busy, setBusy] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -91,6 +92,21 @@ export default function UnitDocumentsPage({ unit }: { unit: string }) {
       await docs.refetch()
       setRejectDoc(null)
       setRejectionReason('')
+    } catch (err) {
+      setActionError(errorMessage(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!deleteDoc) return
+    setBusy(true)
+    setActionError(null)
+    try {
+      await deleteDocument(deleteDoc.id)
+      await docs.refetch()
+      setDeleteDoc(null)
     } catch (err) {
       setActionError(errorMessage(err))
     } finally {
@@ -226,26 +242,41 @@ export default function UnitDocumentsPage({ unit }: { unit: string }) {
                               <Eye className="h-3.5 w-3.5" />
                               View
                             </Button>
-                            <Button
-                              variant="gradient"
-                              size="sm"
-                              className="gap-1.5"
-                              disabled={doc.status === 'approved' || busy}
-                              onClick={() => setApproveDoc(doc)}
-                            >
-                              <Check className="h-3.5 w-3.5" />
-                              Approve
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="gap-1.5"
-                              disabled={doc.status === 'rejected' || busy}
-                              onClick={() => setRejectDoc(doc)}
-                            >
-                              <X className="h-3.5 w-3.5" />
-                              Reject
-                            </Button>
+                            {doc.status === 'pending' ? (
+                              <>
+                                <Button
+                                  variant="gradient"
+                                  size="sm"
+                                  className="gap-1.5"
+                                  disabled={busy}
+                                  onClick={() => setApproveDoc(doc)}
+                                >
+                                  <Check className="h-3.5 w-3.5" />
+                                  Approve
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  className="gap-1.5"
+                                  disabled={busy}
+                                  onClick={() => setRejectDoc(doc)}
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                  Reject
+                                </Button>
+                              </>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                disabled={busy}
+                                onClick={() => setDeleteDoc(doc)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                                Delete
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </motion.tr>
@@ -351,6 +382,34 @@ export default function UnitDocumentsPage({ unit }: { unit: string }) {
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Reject'}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog
+        open={deleteDoc !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteDoc(null)
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Document</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{' '}
+              <span className="font-medium text-foreground">{deleteDoc?.documentName}</span> by{' '}
+              {deleteDoc?.studentName}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {actionError && <p className="text-xs text-destructive">{actionError}</p>}
+          <div className="flex items-center justify-between pt-2">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDelete} disabled={busy}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Delete'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
