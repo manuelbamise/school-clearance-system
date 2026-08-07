@@ -1,7 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ChevronLeft, ChevronRight, Trash2, Loader2 } from 'lucide-react';
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Trash2,
+  Loader2,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +23,11 @@ import {
   DialogDescription,
   DialogClose,
 } from '@/components/ui/dialog';
-import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states';
+import {
+  TableSkeleton,
+  EmptyState,
+  ErrorState,
+} from '@/components/ui/data-states';
 import { useAsync } from '@/hooks/use-async';
 import { getAuditLogs, clearAuditLogs } from '@/lib/api/audit-logs.api';
 import { mapAuditLog } from '@/lib/api/mappers';
@@ -43,7 +53,10 @@ const CLEAR_REQUIREMENTS = [
 ];
 
 const categoryBadge = (cat: AuditLog['category']) => {
-  const map: Record<string, { variant: 'default' | 'warning' | 'destructive'; label: string }> = {
+  const map: Record<
+    string,
+    { variant: 'default' | 'warning' | 'destructive'; label: string }
+  > = {
     login: { variant: 'default', label: 'Login' },
     permission: { variant: 'warning', label: 'Permission' },
     export: { variant: 'destructive', label: 'Export' },
@@ -62,17 +75,21 @@ function SuperadminAuditPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 8;
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [checked, setChecked] = useState<boolean[]>(CLEAR_REQUIREMENTS.map(() => false));
+  const [checked, setChecked] = useState<boolean[]>(
+    CLEAR_REQUIREMENTS.map(() => false),
+  );
   const [clearing, setClearing] = useState(false);
   const [clearError, setClearError] = useState<string | null>(null);
 
   const filteredLogs = useMemo(
     () =>
       logs
-        .filter((l) => categoryFilter === 'all' || l.category === categoryFilter)
+        .filter(
+          (l) => categoryFilter === 'all' || l.category === categoryFilter,
+        )
         .filter((l) =>
           [l.who, l.whoEmail, l.what, l.where, l.why].some((f) =>
             f.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -81,7 +98,10 @@ function SuperadminAuditPage() {
     [logs, searchQuery, categoryFilter],
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredLogs.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredLogs.length / ITEMS_PER_PAGE),
+  );
   const safePage = Math.min(currentPage, totalPages);
   const paginatedLogs = filteredLogs.slice(
     (safePage - 1) * ITEMS_PER_PAGE,
@@ -181,32 +201,36 @@ function SuperadminAuditPage() {
               <ErrorState message={logsReq.error} onRetry={logsReq.refetch} />
             ) : filteredLogs.length === 0 ? (
               <EmptyState
-                title={searchQuery ? 'No logs match your search.' : 'No activity logs found.'}
+                title={
+                  searchQuery
+                    ? 'No logs match your search.'
+                    : 'No activity logs found.'
+                }
               />
             ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      User
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Action
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Timestamp
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Reason
-                    </th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {paginatedLogs.map((log, i) => (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        User
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Action
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Timestamp
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Reason
+                      </th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {paginatedLogs.map((log, i) => (
                       <motion.tr
                         key={log.id}
                         initial={{ opacity: 0, x: -8 }}
@@ -226,9 +250,7 @@ function SuperadminAuditPage() {
                         </td>
                         <td className="px-5 py-3.5">
                           <div className="flex flex-col">
-                            <span className="text-foreground">
-                              {log.what}
-                            </span>
+                            <span className="text-foreground">{log.what}</span>
                             <span className="text-xs text-muted-foreground mt-0.5">
                               {categoryBadge(log.category)}
                             </span>
@@ -242,56 +264,61 @@ function SuperadminAuditPage() {
                         </td>
                         <td className="px-5 py-3.5">
                           <Badge
-                            variant={log.status === 'success' ? 'success' : 'destructive'}
+                            variant={
+                              log.status === 'success'
+                                ? 'success'
+                                : 'destructive'
+                            }
                           >
                             {log.status === 'success' ? 'Success' : 'Failed'}
                           </Badge>
                         </td>
                       </motion.tr>
                     ))}
-                </tbody>
-              </table>
-            </div>
+                  </tbody>
+                </table>
+              </div>
             )}
 
             {/* Pagination */}
-            {!logsReq.isLoading && !logsReq.error && filteredLogs.length > 0 && (
-              <div className="flex items-center justify-between pt-2">
-                <p className="text-xs text-muted-foreground">
-                  Showing{' '}
-                  {Math.min(
-                    (safePage - 1) * ITEMS_PER_PAGE + 1,
-                    filteredLogs.length,
-                  )}
-                  –
-                  {Math.min(safePage * ITEMS_PER_PAGE, filteredLogs.length)}{' '}
-                  of {filteredLogs.length}
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={safePage <= 1}
-                    className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    Previous
-                  </button>
-                  <span className="text-xs text-muted-foreground px-2">
-                    Page {safePage} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((p) => Math.min(totalPages, p + 1))
-                    }
-                    disabled={safePage >= totalPages}
-                    className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    Next
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
+            {!logsReq.isLoading &&
+              !logsReq.error &&
+              filteredLogs.length > 0 && (
+                <div className="flex items-center justify-between pt-2">
+                  <p className="text-xs text-muted-foreground">
+                    Showing{' '}
+                    {Math.min(
+                      (safePage - 1) * ITEMS_PER_PAGE + 1,
+                      filteredLogs.length,
+                    )}
+                    –{Math.min(safePage * ITEMS_PER_PAGE, filteredLogs.length)}{' '}
+                    of {filteredLogs.length}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={safePage <= 1}
+                      className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    >
+                      <ChevronLeft className="h-3.5 w-3.5" />
+                      Previous
+                    </button>
+                    <span className="text-xs text-muted-foreground px-2">
+                      Page {safePage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={safePage >= totalPages}
+                      className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    >
+                      Next
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </CardContent>
         </Card>
       </motion.div>
@@ -307,8 +334,8 @@ function SuperadminAuditPage() {
           <DialogHeader>
             <DialogTitle>Clear All Audit Logs</DialogTitle>
             <DialogDescription>
-              Are you sure you want to clear all audit logs? Confirm the following
-              before continuing.
+              Are you sure you want to clear all audit logs? Confirm the
+              following before continuing.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -327,13 +354,18 @@ function SuperadminAuditPage() {
                     )
                   }
                 />
-                <Label htmlFor={`clear-req-${i}`} className="text-sm text-muted-foreground">
+                <Label
+                  htmlFor={`clear-req-${i}`}
+                  className="text-sm text-muted-foreground"
+                >
                   {req}
                 </Label>
               </div>
             ))}
           </div>
-          {clearError && <p className="text-xs text-destructive">{clearError}</p>}
+          {clearError && (
+            <p className="text-xs text-destructive">{clearError}</p>
+          )}
           <div className="flex items-center justify-between pt-2">
             <DialogClose asChild>
               <Button variant="outline" disabled={clearing}>

@@ -1,7 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, ChevronLeft, ChevronRight, Building2, UserPlus, Trash2, Loader2 } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  UserPlus,
+  Trash2,
+  Loader2,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,10 +32,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TableSkeleton, EmptyState, ErrorState } from '@/components/ui/data-states';
+import {
+  TableSkeleton,
+  EmptyState,
+  ErrorState,
+} from '@/components/ui/data-states';
 import { useAsync } from '@/hooks/use-async';
-import { getDepartments, createDepartment, deleteDepartment } from '@/lib/api/departments.api';
-import { getUsers, createUser, updateUser, deleteUser } from '@/lib/api/users.api';
+import {
+  getDepartments,
+  createDepartment,
+  deleteDepartment,
+} from '@/lib/api/departments.api';
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '@/lib/api/users.api';
 import { mapUserRecord, toApiRole } from '@/lib/api/mappers';
 import { errorMessage } from '@/lib/api/client';
 import type { Department, UserRecord, Role } from '@/types';
@@ -58,7 +80,11 @@ const roleLabel = (role: string) => {
 function SuperadminUsersPage() {
   const departmentsReq = useAsync<Department[]>(async () => {
     const list = await getDepartments();
-    return list.map((d) => ({ id: d.id, name: d.name, userCount: d.userCount }));
+    return list.map((d) => ({
+      id: d.id,
+      name: d.name,
+      userCount: d.userCount,
+    }));
   }, []);
   const usersReq = useAsync<UserRecord[]>(async () => {
     const { users } = await getUsers({ limit: 100 });
@@ -71,13 +97,13 @@ function SuperadminUsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 8;
 
   // Department modal
   const [departmentModalOpen, setDepartmentModalOpen] = useState(false);
   const [deptName, setDeptName] = useState('');
   const [deptPage, setDeptPage] = useState(1);
-  const DEPTS_PER_PAGE = 4;
+  const DEPTS_PER_PAGE = 5;
   const [busy, setBusy] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
@@ -119,14 +145,20 @@ function SuperadminUsersPage() {
     (deptPage - 1) * DEPTS_PER_PAGE,
     deptPage * DEPTS_PER_PAGE,
   );
-  const deptTotalPages = Math.max(1, Math.ceil(departments.length / DEPTS_PER_PAGE));
+  const deptTotalPages = Math.max(
+    1,
+    Math.ceil(departments.length / DEPTS_PER_PAGE),
+  );
 
   const handleDeleteDepartment = async (id: string) => {
     setBusy(true);
     try {
       await deleteDepartment(id);
       await departmentsReq.refetch();
-      const maxPage = Math.max(1, Math.ceil((departments.length - 1) / DEPTS_PER_PAGE));
+      const maxPage = Math.max(
+        1,
+        Math.ceil((departments.length - 1) / DEPTS_PER_PAGE),
+      );
       if (deptPage > maxPage) setDeptPage(maxPage);
     } catch (err) {
       setModalError(errorMessage(err));
@@ -138,7 +170,9 @@ function SuperadminUsersPage() {
   const openEditUser = (user: UserRecord) => {
     setSelectedUser(user);
     setEditedUser({ ...user });
-    setEditDeptId(departments.find((d) => d.name === user.department)?.id ?? '');
+    setEditDeptId(
+      departments.find((d) => d.name === user.department)?.id ?? '',
+    );
     setEditUserOpen(true);
   };
 
@@ -158,7 +192,8 @@ function SuperadminUsersPage() {
       editedUser.department !== selectedUser.department ||
       editedUser.studentId !== selectedUser.studentId ||
       editedUser.staffId !== selectedUser.staffId ||
-      editDeptId !== (departments.find((d) => d.name === selectedUser.department)?.id ?? '')
+      editDeptId !==
+        (departments.find((d) => d.name === selectedUser.department)?.id ?? '')
     );
   }, [selectedUser, editedUser, editDeptId, departments]);
 
@@ -178,7 +213,14 @@ function SuperadminUsersPage() {
           : { staffId: newUser.staffId.trim() || undefined }),
       });
       await usersReq.refetch();
-      setNewUser({ name: '', email: '', role: 'student', department: '', studentId: '', staffId: '' });
+      setNewUser({
+        name: '',
+        email: '',
+        role: 'student',
+        department: '',
+        studentId: '',
+        staffId: '',
+      });
       setUserModalOpen(false);
     } catch (err) {
       setModalError(errorMessage(err));
@@ -240,7 +282,10 @@ function SuperadminUsersPage() {
     [users, searchQuery, roleFilter],
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredUsers.length / ITEMS_PER_PAGE),
+  );
   const safePage = Math.min(currentPage, totalPages);
   const paginatedUsers = filteredUsers.slice(
     (safePage - 1) * ITEMS_PER_PAGE,
@@ -255,7 +300,9 @@ function SuperadminUsersPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-foreground">User Management</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            User Management
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage departments and users across the system.
           </p>
@@ -285,9 +332,15 @@ function SuperadminUsersPage() {
             {departmentsReq.isLoading ? (
               <TableSkeleton rows={4} cols={2} />
             ) : departmentsReq.error ? (
-              <ErrorState message={departmentsReq.error} onRetry={departmentsReq.refetch} />
+              <ErrorState
+                message={departmentsReq.error}
+                onRetry={departmentsReq.refetch}
+              />
             ) : departments.length === 0 ? (
-              <EmptyState title="No departments yet" description="Create your first department." />
+              <EmptyState
+                title="No departments yet"
+                description="Create your first department."
+              />
             ) : (
               <div className="divide-y divide-border rounded-lg border border-border">
                 {paginatedDepartments.map((dept) => (
@@ -320,35 +373,37 @@ function SuperadminUsersPage() {
                 ))}
               </div>
             )}
-            {!departmentsReq.isLoading && !departmentsReq.error && departments.length > DEPTS_PER_PAGE && (
-              <div className="flex items-center justify-between pt-3">
-                <p className="text-xs text-muted-foreground">
-                  Showing {(deptPage - 1) * DEPTS_PER_PAGE + 1}–
-                  {Math.min(deptPage * DEPTS_PER_PAGE, departments.length)} of{' '}
-                  {departments.length}
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setDeptPage((p) => Math.max(1, p - 1))}
-                    disabled={deptPage <= 1}
-                    className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    <ChevronLeft className="h-3 w-3" />
-                    Previous
-                  </button>
-                  <button
-                    onClick={() =>
-                      setDeptPage((p) => Math.min(deptTotalPages, p + 1))
-                    }
-                    disabled={deptPage >= deptTotalPages}
-                    className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    Next
-                    <ChevronRight className="h-3 w-3" />
-                  </button>
+            {!departmentsReq.isLoading &&
+              !departmentsReq.error &&
+              departments.length > DEPTS_PER_PAGE && (
+                <div className="flex items-center justify-between pt-3">
+                  <p className="text-xs text-muted-foreground">
+                    Showing {(deptPage - 1) * DEPTS_PER_PAGE + 1}–
+                    {Math.min(deptPage * DEPTS_PER_PAGE, departments.length)} of{' '}
+                    {departments.length}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setDeptPage((p) => Math.max(1, p - 1))}
+                      disabled={deptPage <= 1}
+                      className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    >
+                      <ChevronLeft className="h-3 w-3" />
+                      Previous
+                    </button>
+                    <button
+                      onClick={() =>
+                        setDeptPage((p) => Math.min(deptTotalPages, p + 1))
+                      }
+                      disabled={deptPage >= deptTotalPages}
+                      className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    >
+                      Next
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </CardContent>
         </Card>
       </motion.div>
@@ -415,7 +470,11 @@ function SuperadminUsersPage() {
               <ErrorState message={usersReq.error} onRetry={usersReq.refetch} />
             ) : filteredUsers.length === 0 ? (
               <EmptyState
-                title={searchQuery ? 'No users match your search.' : 'No users found.'}
+                title={
+                  searchQuery
+                    ? 'No users match your search.'
+                    : 'No users found.'
+                }
               />
             ) : (
               <div className="overflow-x-auto">
@@ -489,43 +548,44 @@ function SuperadminUsersPage() {
             )}
 
             {/* Pagination */}
-            {!usersReq.isLoading && !usersReq.error && filteredUsers.length > 0 && (
-              <div className="flex items-center justify-between pt-2">
-                <p className="text-xs text-muted-foreground">
-                  Showing{' '}
-                  {Math.min(
-                    (safePage - 1) * ITEMS_PER_PAGE + 1,
-                    filteredUsers.length,
-                  )}
-                  –
-                  {Math.min(safePage * ITEMS_PER_PAGE, filteredUsers.length)}{' '}
-                  of {filteredUsers.length}
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={safePage <= 1}
-                    className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    Previous
-                  </button>
-                  <span className="text-xs text-muted-foreground px-2">
-                    Page {safePage} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((p) => Math.min(totalPages, p + 1))
-                    }
-                    disabled={safePage >= totalPages}
-                    className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    Next
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
+            {!usersReq.isLoading &&
+              !usersReq.error &&
+              filteredUsers.length > 0 && (
+                <div className="flex items-center justify-between pt-2">
+                  <p className="text-xs text-muted-foreground">
+                    Showing{' '}
+                    {Math.min(
+                      (safePage - 1) * ITEMS_PER_PAGE + 1,
+                      filteredUsers.length,
+                    )}
+                    –{Math.min(safePage * ITEMS_PER_PAGE, filteredUsers.length)}{' '}
+                    of {filteredUsers.length}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={safePage <= 1}
+                      className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    >
+                      <ChevronLeft className="h-3.5 w-3.5" />
+                      Previous
+                    </button>
+                    <span className="text-xs text-muted-foreground px-2">
+                      Page {safePage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={safePage >= totalPages}
+                      className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    >
+                      Next
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </CardContent>
         </Card>
       </motion.div>
@@ -548,7 +608,9 @@ function SuperadminUsersPage() {
                 placeholder="e.g. Computer Science"
               />
             </div>
-            {modalError && <p className="text-xs text-destructive">{modalError}</p>}
+            {modalError && (
+              <p className="text-xs text-destructive">{modalError}</p>
+            )}
             <div className="flex items-center justify-between pt-2">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
@@ -616,9 +678,7 @@ function SuperadminUsersPage() {
                     <SelectItem value="student">Student</SelectItem>
                     <SelectItem value="academic-unit">Academic</SelectItem>
                     <SelectItem value="bursary-unit">Bursary</SelectItem>
-                    <SelectItem value="department-unit">
-                      Department
-                    </SelectItem>
+                    <SelectItem value="department-unit">Department</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -666,7 +726,9 @@ function SuperadminUsersPage() {
                 />
               </div>
             )}
-            {modalError && <p className="text-xs text-destructive">{modalError}</p>}
+            {modalError && (
+              <p className="text-xs text-destructive">{modalError}</p>
+            )}
             <div className="flex items-center justify-between pt-2">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
@@ -676,7 +738,11 @@ function SuperadminUsersPage() {
                 onClick={handleCreateUser}
                 disabled={!newUser.name.trim() || !newUser.email.trim() || busy}
               >
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create User'}
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Create User'
+                )}
               </Button>
             </div>
           </div>
@@ -751,10 +817,7 @@ function SuperadminUsersPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Department</Label>
-                  <Select
-                    value={editDeptId}
-                    onValueChange={setEditDeptId}
-                  >
+                  <Select value={editDeptId} onValueChange={setEditDeptId}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
@@ -793,7 +856,9 @@ function SuperadminUsersPage() {
                   />
                 </div>
               )}
-              {modalError && <p className="text-xs text-destructive">{modalError}</p>}
+              {modalError && (
+                <p className="text-xs text-destructive">{modalError}</p>
+              )}
               <div className="flex items-center justify-between pt-2">
                 <Button
                   variant="destructive"
@@ -809,7 +874,11 @@ function SuperadminUsersPage() {
                   onClick={handleUpdateUser}
                   disabled={!hasChanges || busy}
                 >
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update'}
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Update'
+                  )}
                 </Button>
               </div>
             </div>
@@ -836,7 +905,11 @@ function SuperadminUsersPage() {
             >
               No
             </Button>
-            <Button variant="destructive" onClick={handleDeleteUser} disabled={busy}>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteUser}
+              disabled={busy}
+            >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Yes'}
             </Button>
           </div>
