@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as documentsController from './documents.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 import { upload } from '../middleware/upload.middleware.js';
+import { uploadDocumentLimiter } from '../middleware/rate-limit.middleware.js';
 
 const documentsRouter = Router();
 
@@ -9,6 +10,7 @@ documentsRouter.use(authenticate);
 
 documentsRouter.post(
   '/',
+  uploadDocumentLimiter,
   authorize('student'),
   upload.single('file'),
   documentsController.create,

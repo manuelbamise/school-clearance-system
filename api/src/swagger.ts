@@ -393,6 +393,7 @@ const swaggerSpec = {
               },
             },
           },
+          '429': { description: 'Too many requests — rate limit exceeded' },
         },
       },
     },
@@ -509,6 +510,7 @@ const swaggerSpec = {
           '400': { description: 'Validation error' },
           '401': { description: 'Unauthorized' },
           '403': { description: 'Forbidden — not superAdmin' },
+          '429': { description: 'Too many requests — rate limit exceeded' },
         },
       },
     },
@@ -653,6 +655,7 @@ const swaggerSpec = {
           '403': {
             description: 'Forbidden — superAdmin cannot create reports',
           },
+          '429': { description: 'Too many requests — rate limit exceeded' },
         },
       },
       get: {
@@ -1072,6 +1075,7 @@ const swaggerSpec = {
           '400': { description: 'Validation error or missing file' },
           '401': { description: 'Unauthorized' },
           '403': { description: 'Forbidden — not a student' },
+          '429': { description: 'Too many requests — rate limit exceeded' },
         },
       },
       get: {
