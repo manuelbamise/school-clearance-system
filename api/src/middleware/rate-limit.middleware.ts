@@ -14,13 +14,13 @@ const handlerLogin = (_req: any, res: any) => {
   });
 };
 
-// export const loginLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   limit: 5,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   handler: handlerLogin,
-// });
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: handlerLogin,
+});
 
 export const createUserLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
