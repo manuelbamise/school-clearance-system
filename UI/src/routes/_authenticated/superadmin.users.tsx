@@ -102,6 +102,10 @@ function SuperadminUsersPage() {
   // Department modal
   const [departmentModalOpen, setDepartmentModalOpen] = useState(false);
   const [deptName, setDeptName] = useState('');
+  const [deptToDelete, setDeptToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [deptPage, setDeptPage] = useState(1);
   const DEPTS_PER_PAGE = 5;
   const [busy, setBusy] = useState(false);
@@ -360,7 +364,7 @@ function SuperadminUsersPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteDepartment(dept.id);
+                          setDeptToDelete(dept);
                         }}
                         disabled={busy}
                         className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
@@ -407,6 +411,51 @@ function SuperadminUsersPage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Delete Department Confirmation Modal */}
+      <Dialog
+        open={deptToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeptToDelete(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Department</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete department "
+              {deptToDelete?.name}"? Users in this department will be
+              unassigned. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {modalError && (
+            <p className="text-xs text-destructive">{modalError}</p>
+          )}
+          <div className="flex items-center justify-between pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setDeptToDelete(null)}
+              disabled={busy}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (deptToDelete) handleDeleteDepartment(deptToDelete.id);
+                setDeptToDelete(null);
+              }}
+              disabled={busy}
+            >
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Delete'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Users Table */}
       <motion.div
