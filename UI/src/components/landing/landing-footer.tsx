@@ -73,7 +73,7 @@ export default function LandingFooter() {
               href="#top"
               className="flex items-center gap-2.5 font-display text-xl font-bold tracking-[-0.02em] text-white no-underline"
             >
-              <BrandLogo variant="dark" className="h-9 w-9" />
+              <BrandLogo variant="dark" className="h-14 w-14" />
               ClearPath
             </a>
             <p className="mt-4 max-w-[260px] text-sm font-normal leading-[1.4] text-lp-muted">
