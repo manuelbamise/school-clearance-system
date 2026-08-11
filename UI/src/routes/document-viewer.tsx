@@ -1,5 +1,6 @@
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { GraduationCap, FileSearch, Loader2, ExternalLink, X } from 'lucide-react'
+import { FileSearch, Loader2, ExternalLink, X } from 'lucide-react'
+import { BrandLogo } from '@/components/brand/brand-logo'
 import { Button } from '@/components/ui/button'
 import { useAsync } from '@/hooks/use-async'
 import { getDocument } from '@/lib/api/documents.api'
@@ -40,12 +41,10 @@ function DocumentViewerPage() {
       <div className="relative flex w-full max-w-4xl flex-col items-center justify-center">
         {/* Branding */}
         <div className="flex flex-col items-center justify-center gap-3 mb-8">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-primary shadow-lg">
-            <GraduationCap className="h-6 w-6 text-white" />
-          </div>
+          <BrandLogo variant="dark" className="h-12 w-12" />
           <div className="flex flex-col items-center gap-1">
             <span className="text-xl font-bold text-white">
-              Clearance Management System
+              ClearPath
             </span>
             <span className="text-xs text-white/50">Document Viewer</span>
           </div>

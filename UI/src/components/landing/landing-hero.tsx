@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCcw,
-  GraduationCap,
   LayoutDashboard,
   ClipboardList,
   BarChart3,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import Reveal from './reveal';
 import LandingLogoMarquee from './landing-marquee';
+import { BrandLogo } from '@/components/brand/brand-logo';
 import { btnPrimary, btnSecondary } from './landing-ui';
 
 /* ---------- Mockup: faithful app frame ---------- */
@@ -211,8 +211,8 @@ function HeroMockup() {
       <div className="relative overflow-hidden rounded-[24px] border border-lp-glow bg-lp-surface shadow-[0_0_120px_rgba(37,99,235,0.12),0_40px_80px_rgba(0,0,0,0.5)] animate-float [transform:perspective(1400px)_rotateX(5deg)_rotateY(-5deg)] after:absolute after:inset-x-0 after:top-0 after:h-px after:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)] max-[809px]:[transform:none]">
         <div className="flex items-center gap-4 border-b border-lp-line bg-white/[0.02] px-5 py-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-[22px] w-[22px] items-center justify-center rounded-[7px] bg-gradient-to-br from-lp-blue to-lp-cyan text-white">
-              <GraduationCap size={13} strokeWidth={2.5} />
+            <span className="flex h-4 w-4">
+              <BrandLogo variant="dark" className="h-4 w-4" />
             </span>
             <span className="text-xs font-bold tracking-[-0.02em] text-white">
               ClearPath

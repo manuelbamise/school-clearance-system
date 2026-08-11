@@ -1,7 +1,8 @@
-import { GraduationCap, FileQuestion, ArrowLeft, LogIn } from 'lucide-react';
+import { FileQuestion, ArrowLeft, LogIn } from 'lucide-react';
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
+import { BrandLogo } from '@/components/brand/brand-logo';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
@@ -29,11 +30,9 @@ export default function NotFoundPage() {
       <div className="relative flex flex-col items-center justify-center">
         {/* Branding */}
         <div className="mb-10 flex flex-col items-center justify-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-primary shadow-lg">
-            <GraduationCap className="h-6 w-6 text-white" />
-          </div>
+          <BrandLogo variant="dark" className="h-12 w-12" />
           <span className="text-xl font-bold text-white">
-            Clearance Management System
+            ClearPath
           </span>
         </div>
 

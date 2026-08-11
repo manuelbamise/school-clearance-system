@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { GraduationCap, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
+import { BrandLogo } from '@/components/brand/brand-logo'
 import { btnPrimary } from './landing-ui'
 
 const links = [
@@ -12,9 +13,6 @@ const links = [
 
 const logoCls =
   'flex items-center gap-2.5 font-display text-xl font-bold tracking-[-0.02em] text-white no-underline'
-
-const logoIconCls =
-  'flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-lp-blue to-lp-cyan text-white shadow-[0_4px_14px_rgba(37,99,235,0.35)]'
 
 export default function LandingNav() {
   const navigate = useNavigate()
@@ -46,9 +44,7 @@ export default function LandingNav() {
       >
         <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between gap-6 px-10 max-[809px]:px-5">
           <a href="#top" className={logoCls}>
-            <span className={logoIconCls}>
-              <GraduationCap size={18} strokeWidth={2.5} />
-            </span>
+            <BrandLogo variant="dark" className="h-9 w-9" />
             ClearPath
           </a>
 
@@ -99,9 +95,7 @@ export default function LandingNav() {
       >
         <div className="mb-6 flex items-center justify-between">
           <a href="#top" className={logoCls} onClick={() => setDrawerOpen(false)}>
-            <span className={logoIconCls}>
-              <GraduationCap size={18} strokeWidth={2.5} />
-            </span>
+            <BrandLogo variant="dark" className="h-9 w-9" />
             ClearPath
           </a>
           <button

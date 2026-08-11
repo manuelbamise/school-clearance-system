@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { BrandLogo } from '@/components/brand/brand-logo';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { useAuth } from '@/contexts/auth-context';
 import { sidebarItems } from '@/data/dummy';
@@ -103,19 +104,11 @@ export default function Sidebar() {
       >
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary text-white">
-              <GraduationCap className="h-4 w-4" />
-            </div>
-            <span className="text-lg font-bold text-gradient">
-              Clearance Management System
-            </span>
+            <BrandLogo className="h-8 w-8" />
+            <span className="text-lg font-bold text-gradient">ClearPath</span>
           </div>
         )}
-        {collapsed && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary text-white">
-            <GraduationCap className="h-4 w-4" />
-          </div>
-        )}
+        {collapsed && <BrandLogo className="h-8 w-8" />}
       </div>
 
       <Separator className="mx-4 w-auto" />

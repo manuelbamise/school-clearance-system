@@ -1,4 +1,4 @@
-import { GraduationCap } from 'lucide-react';
+import { BrandLogo } from '@/components/brand/brand-logo';
 
 const columns = [
   {
@@ -63,9 +63,6 @@ const socials = [
   { label: 'GitHub', icon: <GitHubIcon /> },
 ];
 
-const logoIconCls =
-  'flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-lp-blue to-lp-cyan text-white shadow-[0_4px_14px_rgba(37,99,235,0.35)]';
-
 export default function LandingFooter() {
   return (
     <footer className="border-t border-lp-line bg-lp-deep pt-16">
@@ -76,9 +73,7 @@ export default function LandingFooter() {
               href="#top"
               className="flex items-center gap-2.5 font-display text-xl font-bold tracking-[-0.02em] text-white no-underline"
             >
-              <span className={logoIconCls}>
-                <GraduationCap size={18} strokeWidth={2.5} />
-              </span>
+              <BrandLogo variant="dark" className="h-9 w-9" />
               ClearPath
             </a>
             <p className="mt-4 max-w-[260px] text-sm font-normal leading-[1.4] text-lp-muted">

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { motion, useReducedMotion } from 'framer-motion';
-import { GraduationCap } from 'lucide-react';
+import { BrandLogo } from '@/components/brand/brand-logo';
 import LoginForm from '@/components/auth/login-form';
 import LoginTestimonials from '@/components/auth/login-testimonials';
 import CityIllustration from '@/components/auth/city-illustration';
@@ -42,17 +42,15 @@ function LoginPage() {
             <div className="grid lg:grid-cols-2">
               {/* Left - form */}
               <div className="flex flex-col px-8 py-10 sm:px-12">
-                <div
+<div
                   onClick={() => navigate({ to: '/' })}
                   className="flex items-center gap-3 hover:cursor-pointer hover:opacity-80"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary">
-                    <GraduationCap className="h-5 w-5 text-white" />
+                    <BrandLogo variant="dark" className="h-10 w-10" />
+                    <span className="text-lg font-bold tracking-tight text-white">
+                      ClearPath
+                    </span>
                   </div>
-                  <span className="text-lg font-bold tracking-tight text-white">
-                    Clearance
-                  </span>
-                </div>
 
                 <h2 className="mt-10 text-3xl font-bold tracking-tight text-white">
                   Sign In
