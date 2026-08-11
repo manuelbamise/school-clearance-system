@@ -58,9 +58,13 @@ function GitHubIcon() {
 }
 
 const socials = [
-  { label: 'X (Twitter)', icon: <XIcon /> },
-  { label: 'LinkedIn', icon: <LinkedInIcon /> },
-  { label: 'GitHub', icon: <GitHubIcon /> },
+  { label: 'X (Twitter)', icon: <XIcon />, url: '#top' },
+  { label: 'LinkedIn', icon: <LinkedInIcon />, url: '#top' },
+  {
+    label: 'GitHub',
+    icon: <GitHubIcon />,
+    url: 'https://github.com/manuelbamise/school-clearance-system',
+  },
 ];
 
 export default function LandingFooter() {
@@ -83,10 +87,11 @@ export default function LandingFooter() {
               {socials.map((s) => (
                 <a
                   key={s.label}
-                  href="#top"
+                  href={s.url}
+                  target="_blank"
                   className="flex h-10 w-10 items-center justify-center rounded-xl border border-lp-line text-lp-muted transition-[color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-white hover:text-white"
                   aria-label={s.label}
-                  onClick={(e) => e.preventDefault()}
+                  // onClick={(e) => e.preventDefault()}
                 >
                   {s.icon}
                 </a>
