@@ -42,15 +42,15 @@ function LoginPage() {
             <div className="grid lg:grid-cols-2">
               {/* Left - form */}
               <div className="flex flex-col px-8 py-10 sm:px-12">
-<div
+                <div
                   onClick={() => navigate({ to: '/' })}
                   className="flex items-center gap-3 hover:cursor-pointer hover:opacity-80"
                 >
-                    <BrandLogo variant="dark" className="h-10 w-10" />
-                    <span className="text-lg font-bold tracking-tight text-white">
-                      ClearPath
-                    </span>
-                  </div>
+                  <BrandLogo variant="dark" className="h-10 w-10" />
+                  <span className="text-lg font-bold tracking-tight text-white">
+                    ClearPath
+                  </span>
+                </div>
 
                 <h2 className="mt-10 text-3xl font-bold tracking-tight text-white">
                   Sign In
@@ -70,7 +70,6 @@ function LoginPage() {
                   <div className="space-y-1 text-[11px] text-white/40">
                     <p>student@portal.test / academic@portal.test</p>
                     <p>bursary@portal.test / department@portal.test</p>
-                    <p>super@portal.test</p>
                     <p className="font-medium text-white/60">
                       All passwords: password123
                     </p>
