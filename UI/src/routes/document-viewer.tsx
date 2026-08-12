@@ -1,41 +1,46 @@
-import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { FileSearch, Loader2, ExternalLink, X } from 'lucide-react'
-import { BrandLogo } from '@/components/brand/brand-logo'
-import { Button } from '@/components/ui/button'
-import { useAsync } from '@/hooks/use-async'
-import { getDocument } from '@/lib/api/documents.api'
-import { assetUrl } from '@/utils/axios'
-import { errorMessage } from '@/lib/api/client'
+import { createFileRoute, useSearch } from '@tanstack/react-router';
+import { FileSearch, Loader2, ExternalLink, X } from 'lucide-react';
+import { BrandLogo } from '@/components/brand/brand-logo';
+import { Button } from '@/components/ui/button';
+import { useAsync } from '@/hooks/use-async';
+import { getDocument } from '@/lib/api/documents.api';
+import { assetUrl } from '@/utils/axios';
+import { errorMessage } from '@/lib/api/client';
 
 export const Route = createFileRoute('/document-viewer')({
   component: DocumentViewerPage,
-})
+});
 
-const fallbackName = (name?: string) =>
-  name || 'My Document'
+const fallbackName = (name?: string) => name || 'My Document';
 
 function DocumentViewerPage() {
-  const search = useSearch({ strict: false }) as { id?: string; name?: string; student?: string }
-  const id = search.id
+  const search = useSearch({ strict: false }) as {
+    id?: string;
+    name?: string;
+    student?: string;
+  };
+  const id = search.id;
 
-  const doc = useAsync(async () => (id ? getDocument(id) : null), [id], { enabled: Boolean(id) })
+  const doc = useAsync(async () => (id ? getDocument(id) : null), [id], {
+    enabled: Boolean(id),
+  });
 
-  const fileName = doc.data?.name || fallbackName(search.name)
-  const studentName = doc.data ? doc.data.student.name : search.student || ''
-  const src = doc.data ? assetUrl(doc.data.fileUrl) : ''
+  const fileName = doc.data?.name || fallbackName(search.name);
+  const studentName = doc.data ? doc.data.student.name : search.student || '';
+  const src = doc.data ? assetUrl(doc.data.fileUrl) : '';
 
   const handleClose = () => {
     if (window.history.length > 1) {
-      window.history.back()
+      window.history.back();
     } else {
-      window.close()
+      window.close();
     }
-  }
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-6">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0b1220] via-[#14345f] to-[#0b1220]" />
+      <div className="absolute inset-0 bg-linear-to-br from-[#0b1220] via-[#14345f] to-[#0b1220]" />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMSIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
 
       <div className="relative flex w-full max-w-4xl flex-col items-center justify-center">
@@ -43,9 +48,7 @@ function DocumentViewerPage() {
         <div className="flex flex-col items-center justify-center gap-3 mb-8">
           <BrandLogo variant="dark" className="h-12 w-12" />
           <div className="flex flex-col items-center gap-1">
-            <span className="text-xl font-bold text-white">
-              ClearPath
-            </span>
+            <span className="text-xl font-bold text-white">ClearPath</span>
             <span className="text-xs text-white/50">Document Viewer</span>
           </div>
         </div>
@@ -60,7 +63,9 @@ function DocumentViewerPage() {
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10">
               <FileSearch className="h-7 w-7 text-white/70" />
             </div>
-            <h2 className="text-lg font-semibold text-white">No Document Found</h2>
+            <h2 className="text-lg font-semibold text-white">
+              No Document Found
+            </h2>
             <p className="mt-2 text-sm text-white/60">
               {doc.error
                 ? errorMessage(doc.error, 'The document could not be loaded.')
@@ -79,8 +84,14 @@ function DocumentViewerPage() {
             {/* Header bar */}
             <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-3.5">
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-semibold text-white">{fileName}</span>
-                {studentName && <span className="truncate text-xs text-white/50">{studentName}</span>}
+                <span className="truncate text-sm font-semibold text-white">
+                  {fileName}
+                </span>
+                {studentName && (
+                  <span className="truncate text-xs text-white/50">
+                    {studentName}
+                  </span>
+                )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <button
@@ -103,16 +114,12 @@ function DocumentViewerPage() {
               </div>
             </div>
             {/* Document body */}
-            <div className="aspect-[4/3] w-full bg-neutral-900">
-              <iframe
-                src={src}
-                title={fileName}
-                className="h-full w-full"
-              />
+            <div className="aspect-4/3 w-full bg-neutral-900">
+              <iframe src={src} title={fileName} className="h-full w-full" />
             </div>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
