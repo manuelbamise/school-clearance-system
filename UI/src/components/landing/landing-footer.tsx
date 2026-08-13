@@ -70,7 +70,7 @@ const socials = [
 export default function LandingFooter() {
   return (
     <footer className="border-t border-lp-line bg-lp-deep pt-16">
-      <div className="mx-auto max-w-[1200px] px-10 max-[809px]:px-5">
+      <div className="mx-auto max-w-300 px-10 max-[809px]:px-5">
         <div className="grid grid-cols-2 gap-12 md:grid-cols-3 xl:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
             <a
@@ -80,7 +80,7 @@ export default function LandingFooter() {
               <BrandLogo variant="dark" className="h-14 w-14" />
               ClearPath
             </a>
-            <p className="mt-4 max-w-[260px] text-sm font-normal leading-[1.4] text-lp-muted">
+            <p className="mt-4 max-w-300 text-sm font-normal leading-[1.4] text-lp-muted">
               Streamlining student clearance worldwide.
             </p>
             <div className="mt-5 flex gap-3">
