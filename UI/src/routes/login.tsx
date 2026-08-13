@@ -16,9 +16,9 @@ function LoginPage() {
   return (
     <div className="relative flex min-h-screen overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0b1220] via-[#14345f] to-[#0b1220]" />
+      <div className="absolute inset-0 bg-linear-to-br from-[#0b1220] via-[#14345f] to-[#0b1220]" />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMSIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
-      <div className="absolute -top-32 left-1/2 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-primary/15 blur-[120px]" />
+      <div className="absolute -top-32 left-1/2 h-105 w-180 -translate-x-1/2 rounded-full bg-primary/15 blur-[120px]" />
 
       {/* Skyline silhouette */}
       <svg
