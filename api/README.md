@@ -9,9 +9,8 @@ The REST API for the Student Clearance Management System. Built with **Node.js**
 | Runtime | Node.js (ESM) |
 | Framework | Express 5 |
 | Language | TypeScript |
-| ORM / database | Prisma + SQLite |
+| ORM + database | Prisma + SQLite |
 | Authentication | Passport.js (local + JWT strategies) |
-| Tokens | JSON Web Tokens |
 | Validation | zod |
 | File uploads | multer (disk storage) |
 | API docs | swagger-jsdoc + swagger-ui-express |
