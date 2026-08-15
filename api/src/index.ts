@@ -13,7 +13,7 @@ import { uploadsDirPath } from './middleware/upload.middleware.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.set('trust proxy', process.env.NODE_ENV === 'production' ? 1 : false);
+app.set('trust proxy', process.env.NODE_ENV === 'PRODUCTION' ? 1 : false);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -35,4 +35,5 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
 });

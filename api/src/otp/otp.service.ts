@@ -10,7 +10,10 @@ const OTP_TTL_SECONDS = 10 * 60;
 
 const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
 const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-const redis = redisUrl && redisToken ? new Redis({ url: redisUrl, token: redisToken }) : null;
+const redis =
+  redisUrl && redisToken
+    ? new Redis({ url: redisUrl, token: redisToken })
+    : null;
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const emailFrom = process.env.EMAIL_FROM || 'ClearPath <onboarding@resend.dev>';
@@ -21,7 +24,10 @@ const memoryStore = new Map<string, { code: string; expiresAt: number }>();
 const otpKey = (userId: string) => `otp:${userId}`;
 
 const generateCode = (): string =>
-  crypto.randomInt(0, 10 ** OTP_LENGTH).toString().padStart(OTP_LENGTH, '0');
+  crypto
+    .randomInt(0, 10 ** OTP_LENGTH)
+    .toString()
+    .padStart(OTP_LENGTH, '0');
 
 const timingSafeEqualStr = (a: string, b: string) => {
   const ba = Buffer.from(a);
@@ -35,7 +41,10 @@ const storeCode = async (userId: string, code: string) => {
     await redis.set(otpKey(userId), code, { ex: OTP_TTL_SECONDS });
     return;
   }
-  memoryStore.set(otpKey(userId), { code, expiresAt: Date.now() + OTP_TTL_SECONDS * 1000 });
+  memoryStore.set(otpKey(userId), {
+    code,
+    expiresAt: Date.now() + OTP_TTL_SECONDS * 1000,
+  });
 };
 
 const getCode = async (userId: string): Promise<string | null> => {
@@ -48,7 +57,7 @@ const getCode = async (userId: string): Promise<string | null> => {
     memoryStore.delete(otpKey(userId));
     return null;
   }
-  return entry.code;
+  return entry.code as string;
 };
 
 const deleteCode = async (userId: string) => {
@@ -85,7 +94,7 @@ export const sendOtp = async (userId: string, email: string) => {
     return;
   }
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'PRODUCTION') {
     console.log(`[OTP] Verification code for ${email}: ${code}`);
     return;
   }
@@ -93,12 +102,20 @@ export const sendOtp = async (userId: string, email: string) => {
   throw new AppError('Email service is not configured', 500);
 };
 
-export const verifyOtp = async (userId: string, email: string, code: string) => {
-  const stored = await getCode(userId);
-  if (!stored) {
-    throw new AppError('Verification code has expired. Please request a new one.', 400);
+export const verifyOtp = async (
+  userId: string,
+  email: string,
+  code: string,
+) => {
+  const stored: string | null = await getCode(userId);
+  if (!stored || stored == null) {
+    throw new AppError(
+      'Verification code has expired. Please request a new one.',
+      400,
+    );
   }
-  if (!timingSafeEqualStr(stored, code)) {
+
+  if (!timingSafeEqualStr(stored.toString(), code)) {
     throw new AppError('Invalid verification code.', 400);
   }
 

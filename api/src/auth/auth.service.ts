@@ -24,7 +24,7 @@ export const logLogin = async (userId: string, ipAddress?: string) => {
 
 export const generateToken = (user: { id: string; role: string }) => {
   return jwt.sign({ sub: user.id, role: user.role }, JWT_SECRET, {
-    expiresIn: '7d',
+    expiresIn: '2h',
   });
 };
 
