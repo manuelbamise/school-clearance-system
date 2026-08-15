@@ -811,6 +811,16 @@ function SuperadminUsersPage() {
           </DialogHeader>
           {editedUser && (
             <div className="space-y-4">
+              <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Verification Status
+                </span>
+                <Badge
+                  variant={editedUser.isVerified ? 'success' : 'warning'}
+                >
+                  {editedUser.isVerified ? 'Verified' : 'Unverified'}
+                </Badge>
+              </div>
               <div className="space-y-2">
                 <Label>Full Name</Label>
                 <Input

@@ -7,7 +7,12 @@ import { errorMessage } from '@/lib/api/client'
 
 interface AuthContextType {
   user: User | null
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: string }>
+  login: (email: string, password: string) => Promise<{
+    success: boolean
+    error?: string
+    role?: string
+    isVerified?: boolean
+  }>
   logout: () => void
   isLoading: boolean
   isHydrating: boolean
@@ -63,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(token)
       setUser(mapped)
       localStorage.setItem(USER_KEY, JSON.stringify(mapped))
-      return { success: true, role: mapped.role }
+      return { success: true, role: mapped.role, isVerified: mapped.isVerified }
     } catch (err) {
       return { success: false, error: errorMessage(err, 'Invalid email or password') }
     } finally {

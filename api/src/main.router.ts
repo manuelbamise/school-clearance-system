@@ -8,6 +8,7 @@ import activitiesRouter from './activities/activities.router.js';
 import documentsRouter from './documents/documents.router.js';
 import clearanceRouter from './clearance/clearance.router.js';
 import metricsRouter from './metrics/metrics.router.js';
+import otpRouter from './otp/otp.router.js';
 
 const mainRouter = Router();
 
@@ -24,5 +25,6 @@ mainRouter.use('/activities', activitiesRouter);
 mainRouter.use('/documents', documentsRouter);
 mainRouter.use('/clearance', clearanceRouter);
 mainRouter.use('/metrics', metricsRouter);
+mainRouter.use('/otp', otpRouter);
 
 export default mainRouter;

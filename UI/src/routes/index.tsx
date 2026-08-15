@@ -19,6 +19,9 @@ function IndexRouteComponent() {
   const { user } = useAuth()
 
   if (user) {
+    if (!user.isVerified) {
+      return <Navigate to="/verify-otp" replace />
+    }
     return <Navigate to={DASHBOARD_BY_ROLE[user.role] as never} replace />
   }
 

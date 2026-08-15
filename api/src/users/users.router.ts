@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import * as usersController from './users.controller.js';
-import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import { authenticateVerified, authorize } from '../middleware/auth.middleware.js';
 import { createUserLimiter } from '../middleware/rate-limit.middleware.js';
 
 const usersRouter = Router();
 
-usersRouter.use(authenticate);
+usersRouter.use(authenticateVerified);
 usersRouter.use(authorize('superAdmin'));
 
 usersRouter.get('/', usersController.getAll);

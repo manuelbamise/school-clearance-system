@@ -45,3 +45,19 @@ export const uploadDocumentLimiter = rateLimit({
   legacyHeaders: false,
   handler,
 });
+
+export const otpSendLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler,
+});
+
+export const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler,
+});
