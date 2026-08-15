@@ -18,6 +18,7 @@ const users = [
     name: 'Super Admin',
     role: 'superAdmin' as const,
     staffId: 'ADM001',
+    isVerified: true,
   },
   {
     email: 'student@portal.test',
@@ -26,6 +27,7 @@ const users = [
     role: 'student' as const,
     studentId: 'STU001',
     departmentIndex: 0,
+    isVerified: false,
   },
   {
     email: 'academic@portal.test',
@@ -34,6 +36,7 @@ const users = [
     role: 'academic' as const,
     staffId: 'ACA001',
     departmentIndex: 0,
+    isVerified: false,
   },
   {
     email: 'bursary@portal.test',
@@ -41,6 +44,7 @@ const users = [
     name: 'Bursar Officer',
     role: 'bursary' as const,
     staffId: 'BUR001',
+    isVerified: false,
   },
   {
     email: 'department@portal.test',
@@ -49,6 +53,7 @@ const users = [
     role: 'department' as const,
     staffId: 'DEP001',
     departmentIndex: 1,
+    isVerified: false,
   },
   {
     email: 'csdepartment@portal.test',
@@ -57,6 +62,7 @@ const users = [
     role: 'department' as const,
     staffId: 'DEP002',
     departmentIndex: 0,
+    isVerified: false,
   },
 ];
 
@@ -116,7 +122,7 @@ async function main() {
 
     await prisma.user.upsert({
       where: { email: rest.email },
-      update: {},
+      update: { isVerified: rest.isVerified },
       create: {
         ...rest,
         password: hashedPassword,

@@ -14,6 +14,23 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   })(req, res, next);
 };
 
+export const authenticateVerified = (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate('jwt', { session: false }, (err: Error | null, user: Express.User | false) => {
+    if (err) return next(err);
+    if (!user) {
+      return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+    }
+    const u = user as { isVerified?: boolean };
+    if (!u.isVerified) {
+      return res
+        .status(403)
+        .json({ status: 'error', message: 'Email not verified', code: 'EMAIL_NOT_VERIFIED' });
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+};
+
 export const authorize = (...roles: Role[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {

@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import * as metricsController from './metrics.controller.js';
-import { authenticate } from '../middleware/auth.middleware.js';
+import { authenticateVerified } from '../middleware/auth.middleware.js';
 
 const metricsRouter = Router();
 
-metricsRouter.get('/', authenticate, metricsController.getMetrics);
+metricsRouter.get('/', authenticateVerified, metricsController.getMetrics);
 
 export default metricsRouter;

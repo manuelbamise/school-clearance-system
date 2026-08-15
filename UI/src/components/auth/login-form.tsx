@@ -40,8 +40,14 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setError('');
     const result = await login(data.email, data.password);
-    if (result.success && result.role) {
-      navigate({ to: dashboardPath[result.role] || '/student/dashboard' });
+    if (result.success) {
+      if (!result.isVerified) {
+        navigate({ to: '/verify-otp' });
+        return;
+      }
+      if (result.role) {
+        navigate({ to: dashboardPath[result.role] || '/student/dashboard' });
+      }
     } else {
       setError(result.error || 'Login failed');
     }
