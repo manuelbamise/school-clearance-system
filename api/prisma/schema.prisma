@@ -22,6 +22,7 @@ model User {
   studentId    String?
   staffId      String?
   role         String
+  isVerified   Boolean    @default(false)
   departmentId String?
   department   Department? @relation(fields: [departmentId], references: [id])
   createdAt    DateTime   @default(now())

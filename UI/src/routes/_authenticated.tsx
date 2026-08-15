@@ -49,6 +49,10 @@ function AuthenticatedLayout() {
       navigate({ to: '/login', replace: true })
       return
     }
+    if (!user.isVerified) {
+      navigate({ to: '/verify-otp', replace: true })
+      return
+    }
     const path = location.pathname
     const prefix = rolePrefix[user.role]
     const isOnOwnRoute = path === '/' || path.startsWith(prefix)

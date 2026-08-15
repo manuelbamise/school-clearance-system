@@ -10,6 +10,7 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  isVerified: boolean;
   avatar?: string;
   phone?: string;
   studentId?: string;
@@ -85,6 +86,7 @@ export interface UserRecord {
   email: string;
   role: string;
   department: string;
+  isVerified: boolean;
   lastActive: string;
   studentId?: string;
   staffId?: string;

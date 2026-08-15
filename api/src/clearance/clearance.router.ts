@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import * as clearanceController from './clearance.controller.js';
-import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import { authenticateVerified, authorize } from '../middleware/auth.middleware.js';
 
 const clearanceRouter = Router();
 
-clearanceRouter.use(authenticate);
+clearanceRouter.use(authenticateVerified);
 
 clearanceRouter.get('/me', authorize('student'), clearanceController.getMine);
 clearanceRouter.get(

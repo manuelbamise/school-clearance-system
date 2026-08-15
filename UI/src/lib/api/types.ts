@@ -15,6 +15,7 @@ export interface ApiUser {
   studentId: string | null
   staffId: string | null
   role: ApiRole
+  isVerified: boolean
   departmentId: string | null
   department: ApiDepartment | null
   createdAt: string
