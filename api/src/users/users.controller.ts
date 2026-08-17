@@ -7,7 +7,11 @@ const sanitize = <T extends { password: string }>(user: T) => {
   return rest;
 };
 
-export const getAll = async (req: Request, res: Response, next: NextFunction) => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
@@ -20,11 +24,17 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const getById = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+export const getById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = await usersService.getById(req.params.id);
     if (!user) {
-      return res.status(404).json({ status: 'error', message: 'User not found' });
+      return res
+        .status(404)
+        .json({ status: 'error', message: 'User not found' });
     }
     res.json({ status: 'success', data: sanitize(user) });
   } catch (err) {
@@ -32,7 +42,11 @@ export const getById = async (req: Request<{ id: string }>, res: Response, next:
   }
 };
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const data = createUserSchema.parse(req.body);
     const performedByUserId = (req.user as { id: string }).id;
@@ -43,21 +57,39 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const update = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+export const update = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const data = updateUserSchema.parse(req.body);
     const performedByUserId = (req.user as { id: string }).id;
-    const user = await usersService.update(req.params.id, data, performedByUserId, req.ip);
+    const user = await usersService.update(
+      req.params.id,
+      data,
+      performedByUserId,
+      req.ip,
+    );
     res.json({ status: 'success', data: sanitize(user) });
   } catch (err) {
     next(err);
   }
 };
 
-export const remove = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+export const remove = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const performedByUserId = (req.user as { id: string }).id;
-    await usersService.remove(req.params.id, performedByUserId, req.ip);
+    const user = await usersService.remove(
+      req.params.id,
+      performedByUserId,
+      req.ip,
+    );
+    console.log(user + ' deleted');
     res.json({ status: 'success', message: 'User deleted' });
   } catch (err) {
     next(err);
