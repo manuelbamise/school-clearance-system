@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import { Redis } from '@upstash/redis';
-import { Resend } from 'resend';
 import prisma from '../lib/prisma.js';
 import { AppError } from '../lib/AppError.js';
 import * as activitiesService from '../activities/activities.service.js';
+import { sendEmail } from '../email/email.service.js';
 
 const OTP_LENGTH = 6;
 const OTP_TTL_SECONDS = 10 * 60;
@@ -14,10 +14,6 @@ const redis =
   redisUrl && redisToken
     ? new Redis({ url: redisUrl, token: redisToken })
     : null;
-
-const resendApiKey = process.env.RESEND_API_KEY;
-const emailFrom = process.env.EMAIL_FROM || 'ClearPath <onboarding@resend.dev>';
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 const memoryStore = new Map<string, { code: string; expiresAt: number }>();
 
@@ -72,34 +68,25 @@ export const sendOtp = async (userId: string, email: string) => {
   const code = generateCode();
   await storeCode(userId, code);
 
-  if (resend) {
-    await resend.emails.send({
-      from: emailFrom,
-      to: email,
-      subject: 'Your ClearPath verification code',
-      html: `<!doctype html>
-        <html>
-          <body style="font-family: Arial, sans-serif; background: #f4f6fa; padding: 24px;">
-            <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; border: 1px solid #e5e7eb;">
-              <h2 style="margin: 0 0 8px; color: #0f172a;">Verify your email</h2>
-              <p style="color: #64748b; margin: 0 0 24px;">Use the code below to verify your ClearPath account. This code expires in 10 minutes.</p>
-              <div style="font-size: 32px; font-weight: 700; letter-spacing: 8px; text-align: center; color: #2563eb; padding: 16px 0; background: #f1f5f9; border-radius: 12px;">
-                ${code}
-              </div>
-              <p style="color: #94a3b8; font-size: 13px; margin: 24px 0 0;">If you didn't request this, you can safely ignore this email.</p>
-            </div>
-          </body>
-        </html>`,
-    });
-    return;
-  }
+  const html = `<!doctype html>
+    <html>
+      <body style="font-family: Arial, sans-serif; background: #f4f6fa; padding: 24px;">
+        <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; border: 1px solid #e5e7eb;">
+          <h2 style="margin: 0 0 8px; color: #0f172a;">Verify your email</h2>
+          <p style="color: #64748b; margin: 0 0 24px;">Use the code below to verify your ClearPath account. This code expires in 10 minutes.</p>
+          <div style="font-size: 32px; font-weight: 700; letter-spacing: 8px; text-align: center; color: #2563eb; padding: 16px 0; background: #f1f5f9; border-radius: 12px;">
+            ${code}
+          </div>
+          <p style="color: #94a3b8; font-size: 13px; margin: 24px 0 0;">If you didn't request this, you can safely ignore this email.</p>
+        </div>
+      </body>
+    </html>`;
 
-  if (process.env.NODE_ENV !== 'PRODUCTION') {
-    console.log(`[OTP] Verification code for ${email}: ${code}`);
-    return;
-  }
-
-  throw new AppError('Email service is not configured', 500);
+  await sendEmail({
+    to: email,
+    subject: 'Your ClearPath verification code',
+    html,
+  });
 };
 
 export const verifyOtp = async (
