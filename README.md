@@ -117,7 +117,6 @@ The database seed includes ready-made accounts, all with the password `password1
 | `bursary@portal.test` | Bursary unit |
 | `department@portal.test` | Department unit |
 
-<!--| `super@portal.test` | Superadmin |-->
 
 
 ### Useful commands
