@@ -86,12 +86,10 @@ The database seed includes ready-made accounts, all with the password `password1
 
 | Email | Role |
 | --- | --- |
-| `super@portal.test` | Superadmin |
 | `student@portal.test` | Student |
 | `academic@portal.test` | Academic unit |
 | `bursary@portal.test` | Bursary unit |
 | `department@portal.test` | Department unit |
-| `csdepartment@portal.test` | Department unit (CS) |
 
 ### Useful commands
 
