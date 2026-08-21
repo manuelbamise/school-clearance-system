@@ -9,6 +9,7 @@ import swaggerSpec from './swagger.js';
 import './auth/passport.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { uploadsDirPath } from './middleware/upload.middleware.js';
+import { isProduction } from './lib/supabase.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,7 +29,9 @@ app.use(
 );
 app.use(express.json());
 app.use(passport.initialize());
-app.use('/uploads', express.static(uploadsDirPath));
+if (!isProduction) {
+  app.use('/uploads', express.static(uploadsDirPath));
+}
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', mainRouter);
 app.use(errorHandler);
