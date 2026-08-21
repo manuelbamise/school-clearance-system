@@ -2,27 +2,34 @@ import fs from 'fs';
 import path from 'path';
 import prisma from '../lib/prisma.js';
 import { AppError } from '../lib/AppError.js';
+import { isProduction } from '../lib/supabase.js';
+import * as storageService from '../storage/storage.service.js';
 import { uploadsDirPath } from '../middleware/upload.middleware.js';
 import * as activitiesService from '../activities/activities.service.js';
 import type { CreateDocumentInput, ReviewDocumentInput } from './documents.validation.js';
 
-const resolveRecipient = async (unit: string, studentDepartmentId: string | null) => {
-  if (unit === 'academic' || unit === 'bursary') {
-    return prisma.user.findFirst({ where: { role: unit } });
-  }
+const DOCUMENTS_BUCKET = process.env.SUPABASE_DOCUMENTS_BUCKET || 'documents'
 
-  if (!studentDepartmentId) return null;
-  return prisma.user.findFirst({
-    where: { role: 'department', departmentId: studentDepartmentId },
-  });
-};
+const generateStoragePath = (studentId: string, originalName: string) => {
+  const ext = path.extname(originalName).toLowerCase()
+  const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`
+  return `documents/${studentId}/${unique}${ext}`
+}
 
 export const create = async (
   studentId: string,
   data: CreateDocumentInput,
-  file: { path: string; size: number; mimetype: string },
+  file: { path: string; size: number; mimetype: string; buffer?: Buffer; originalname?: string },
   ipAddress?: string,
 ) => {
+  let storedFilePath = file.path
+
+  if (isProduction && file.buffer && file.originalname) {
+    const storagePath = generateStoragePath(studentId, file.originalname)
+    await storageService.uploadFile(DOCUMENTS_BUCKET, storagePath, file.buffer, file.mimetype)
+    storedFilePath = storagePath
+  }
+
   return prisma.$transaction(async (tx) => {
     const student = await tx.user.findUnique({ where: { id: studentId } });
     if (!student) throw new AppError('Student not found', 404);
@@ -43,7 +50,7 @@ export const create = async (
         level: data.level,
         session: data.session,
         unit: data.unit,
-        filePath: file.path,
+        filePath: storedFilePath,
         fileSize: file.size,
         mimeType: file.mimetype,
         studentId,
@@ -267,8 +274,12 @@ export const remove = async (
     return document;
   }).then(async (document) => {
     if (document.filePath) {
-      const filePath = path.join(uploadsDirPath, path.basename(document.filePath));
-      await fs.promises.unlink(filePath).catch(() => {});
+      if (isProduction) {
+        await storageService.deleteFile(DOCUMENTS_BUCKET, document.filePath)
+      } else {
+        const filePath = path.join(uploadsDirPath, path.basename(document.filePath))
+        await fs.promises.unlink(filePath).catch(() => {})
+      }
     }
     await activitiesService.log(
       userId,
