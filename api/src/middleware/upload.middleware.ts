@@ -5,9 +5,12 @@ import { fileURLToPath } from 'url';
 import { AppError } from '../lib/AppError.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isProduction = process.env.NODE_ENV === 'PRODUCTION';
 
 const uploadsDir = path.resolve(__dirname, '../../uploads');
-if (!fs.existsSync(uploadsDir)) {
+if (!uploadsDir && !isProduction) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+} else if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
@@ -21,15 +24,6 @@ const ALLOWED_EXTENSIONS = new Set([
   '.txt',
 ]);
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${unique}${ext}`);
-  },
-});
-
 const fileFilter = (
   _req: Express.Request,
   file: Express.Multer.File,
@@ -42,6 +36,17 @@ const fileFilter = (
     cb(new AppError('Unsupported file type', 400));
   }
 };
+
+const storage = isProduction
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (_req, _file, cb) => cb(null, uploadsDir),
+      filename: (_req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        cb(null, `${unique}${ext}`);
+      },
+    });
 
 export const upload = multer({
   storage,
