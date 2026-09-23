@@ -43,6 +43,8 @@ const storeCode = async (userId: string, code: string) => {
   });
 };
 
+let DEV_CODE: string;
+
 const getCode = async (userId: string): Promise<string | null> => {
   if (redis) {
     return redis.get<string>(otpKey(userId));
@@ -66,6 +68,19 @@ const deleteCode = async (userId: string) => {
 
 export const sendOtp = async (userId: string, email: string) => {
   const code = generateCode();
+
+  if (process.env.NODE_ENV !== 'PRODUCTION') {
+    DEV_CODE = code;
+    const html = code;
+
+    await sendEmail({
+      to: email,
+      subject: 'Your ClearPath verification code',
+      html,
+    });
+    return;
+  }
+
   await storeCode(userId, code);
 
   const html = `<!doctype html>
@@ -94,6 +109,46 @@ export const verifyOtp = async (
   email: string,
   code: string,
 ) => {
+  if (process.env.NODE_ENV !== 'PRODUCTION') {
+    const stored: string | null = DEV_CODE;
+    if (!stored || stored == null) {
+      throw new AppError(
+        'Verification code has expired. Please request a new one.',
+        400,
+      );
+    }
+
+    if (!timingSafeEqualStr(stored.toString(), code)) {
+      throw new AppError('Invalid verification code.', 400);
+    }
+
+    await deleteCode(userId);
+
+    const user = await prisma.$transaction(async (tx) => {
+      const u = await tx.user.update({
+        where: { id: userId },
+        data: { isVerified: true },
+        include: { department: true },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId,
+          action: 'Email verified',
+          reason: 'User verified their email via OTP',
+          category: 'login',
+          status: 'success',
+          ipAddress: null,
+        },
+      });
+
+      return u;
+    });
+
+    await activitiesService.log(userId, 'verified email', email, 'success');
+    return user;
+  }
+
   const stored: string | null = await getCode(userId);
   if (!stored || stored == null) {
     throw new AppError(
