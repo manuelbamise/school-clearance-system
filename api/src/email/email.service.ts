@@ -12,13 +12,13 @@ export interface SendEmailParams {
 }
 
 export const sendEmail = async ({ to, subject, html }: SendEmailParams) => {
-  if (resend) {
-    await resend.emails.send({ from: emailFrom, to, subject, html });
+  if (process.env.NODE_ENV !== 'PRODUCTION') {
+    console.log(`[EMAIL] To: ${to} | Subject: ${subject} | Code:${html}`);
     return;
   }
 
-  if (process.env.NODE_ENV !== 'PRODUCTION') {
-    console.log(`[EMAIL] To: ${to} | Subject: ${subject}`);
+  if (resend) {
+    await resend.emails.send({ from: emailFrom, to, subject, html });
     return;
   }
 
