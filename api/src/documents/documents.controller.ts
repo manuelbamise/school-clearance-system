@@ -7,13 +7,13 @@ import {
   reviewDocumentSchema,
 } from './documents.validation.js';
 
-const DOCUMENTS_BUCKET = process.env.SUPABASE_DOCUMENTS_BUCKET || 'documents'
+const DOCUMENTS_BUCKET = process.env.SUPABASE_DOCUMENTS_BUCKET || 'documents';
 
 const sanitize = async (doc: any) => {
-  let fileUrl: string | null = doc.filePath
+  let fileUrl: string | null = doc.filePath;
 
   if (isProduction && doc.filePath) {
-    fileUrl = await storageService.getSignedUrl(DOCUMENTS_BUCKET, doc.filePath)
+    fileUrl = await storageService.getSignedUrl(DOCUMENTS_BUCKET, doc.filePath);
   }
 
   return {
@@ -46,7 +46,7 @@ const sanitize = async (doc: any) => {
     date: doc.createdAt.toISOString().split('T')[0],
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
-  }
+  };
 };
 
 export const create = async (
@@ -56,7 +56,9 @@ export const create = async (
 ) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ status: 'error', message: 'File is required' });
+      return res
+        .status(400)
+        .json({ status: 'error', message: 'File is required' });
     }
     const data = createDocumentSchema.parse(req.body);
     const studentId = (req.user as { id: string }).id;
@@ -75,7 +77,12 @@ export const create = async (
           mimetype: req.file.mimetype,
         };
 
-    const document = await documentsService.create(studentId, data, file, req.ip);
+    const document = await documentsService.create(
+      studentId,
+      data,
+      file,
+      req.ip,
+    );
     res.status(201).json({ status: 'success', data: await sanitize(document) });
   } catch (err) {
     next(err);
@@ -98,7 +105,11 @@ export const getMine = async (
       limit,
       status,
     });
-    res.json({ status: 'success', data: await Promise.all(documents.map(sanitize)), meta });
+    res.json({
+      status: 'success',
+      data: await Promise.all(documents.map(sanitize)),
+      meta,
+    });
   } catch (err) {
     next(err);
   }
@@ -112,7 +123,9 @@ export const getById = async (
   try {
     const document = await documentsService.getById(req.params.id);
     if (!document) {
-      return res.status(404).json({ status: 'error', message: 'Document not found' });
+      return res
+        .status(404)
+        .json({ status: 'error', message: 'Document not found' });
     }
     res.json({ status: 'success', data: await sanitize(document) });
   } catch (err) {
@@ -138,7 +151,11 @@ export const getInbox = async (
       status,
       search,
     });
-    res.json({ status: 'success', data: await Promise.all(documents.map(sanitize)), meta });
+    res.json({
+      status: 'success',
+      data: await Promise.all(documents.map(sanitize)),
+      meta,
+    });
   } catch (err) {
     next(err);
   }
